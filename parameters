@@ -1,0 +1,19 @@
+{
+    "decoding_tag": "200601_decoding",
+    "neural_tag": "200601_neural",
+    "pipeline_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline",
+    "patterns_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/patterns",
+    "logreg_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/logreg",
+    "neural_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/neural",
+    "glm_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/glm",
+    "extraction_start_time": -3,
+    "extraction_stop_time": 1.5,
+    "logreg_start_time": -2,
+    "logreg_stop_time": 0.5,
+    "logreg_bin_width": 0.25,
+    "glm_start_frame": -500,
+    "glm_stop_frame": 200,
+    "late_response_threshold": 0.5,
+    "unit_db_dir": "/home/jack/Dropbox/scripts/20200601_unit_db",
+    "scaling_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/scaling"
+}
