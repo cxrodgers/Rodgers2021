@@ -1,11 +1,11 @@
 {
     "decoding_tag": "200601_decoding",
     "neural_tag": "200601_neural",
-    "pipeline_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline",
-    "patterns_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/patterns",
-    "logreg_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/logreg",
-    "neural_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/neural",
-    "glm_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/glm",
+    "pipeline_dir": "/home/jack/mnt/nas2_home/misc/20210503_pipeline",
+    "patterns_dir": "/home/jack/mnt/nas2_home/misc/20210503_pipeline/patterns",
+    "logreg_dir": "/home/jack/mnt/nas2_home/misc/20210503_pipeline/logreg",
+    "neural_dir": "/home/jack/mnt/nas2_home/misc/20210503_pipeline/neural",
+    "glm_dir": "/home/jack/mnt/nas2_home/misc/20210503_pipeline/glm",
     "extraction_start_time": -3,
     "extraction_stop_time": 1.5,
     "logreg_start_time": -2,
@@ -14,6 +14,7 @@
     "glm_start_frame": -500,
     "glm_stop_frame": 200,
     "late_response_threshold": 0.5,
-    "unit_db_dir": "/home/jack/Dropbox/scripts/20200601_unit_db",
-    "scaling_dir": "/home/jack/mnt/nas2_home/misc/20210422_pipeline/scaling"
+    "root_session_dir": "/home/jack/mnt/nas2_home/misc/20210503_pipeline_input/sessions",
+    "unit_db_dir": "/home/jack/mnt/nas2_home/misc/20210503_pipeline_input/neural_metadata",
+    "scaling_dir": "/home/jack/mnt/nas2_home/misc/20210503_pipeline/scaling"
 }
