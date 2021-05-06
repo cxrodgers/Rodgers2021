@@ -25,8 +25,8 @@ session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
 
 
 ## Create pipeline and patterns dir
-if not os.path.exists(params['pipeline_dir']):
-    os.mkdir(params['pipeline_dir'])
+if not os.path.exists(params['pipeline_output_dir']):
+    os.mkdir(params['pipeline_output_dir'])
 if not os.path.exists(params['patterns_dir']):
     os.mkdir(params['patterns_dir'])
     
@@ -42,7 +42,7 @@ for session_name in tqdm.tqdm(session_name_l):
     ## Get session data
     gs = runner.models.GrandSession.objects.filter(name=session_name).first()
     vs = whiskvid.django_db.VideoSession.from_name(session_name)
-    
+
     
     ## Process trial matrix
     # Load trial matrix
