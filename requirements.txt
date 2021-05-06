@@ -14,3 +14,4 @@ sqlalchemy==1.4.7
 requests=2.25.1
 pytables==3.6.1
 tqdm==4.59.0
+jedi==0.17.2
