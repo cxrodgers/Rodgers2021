@@ -6,7 +6,7 @@
     "logreg_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_output/logreg",
     "neural_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_output/neural",
     "glm_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_output/glm",
-    "scaling_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_output/scaling"
+    "scaling_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_output/scaling",
     "extraction_start_time": -3,
     "extraction_stop_time": 1.5,
     "logreg_start_time": -2,
@@ -17,5 +17,5 @@
     "late_response_threshold": 0.5,
     "pipeline_input_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input",
     "root_session_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input/sessions",
-    "unit_db_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input/neural_metadata",
+    "unit_db_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input/neural_metadata"
 }
