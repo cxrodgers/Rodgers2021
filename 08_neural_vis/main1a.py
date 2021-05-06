@@ -199,8 +199,11 @@ if PLOT_FR_VS_WHISKING_AMPLITUDE_NOCONTACT_BY_NS_AND_STRATUM:
 
 
     ## Plot
-    f, ax = my.plot.figure_1x1_small()
-    f.subplots_adjust(left=.2)
+    #~ f, ax = my.plot.figure_1x1_small()
+    #~ f.subplots_adjust(left=.2)
+
+    f, ax = plt.subplots(1, 1, figsize=(2.6, 2.4))
+    f.subplots_adjust(bottom=.28, left=.3, right=.95, top=.95)
     
     # Iterate over subpops
     for grouped_keys, sub_bwid in grouped_neurons:
@@ -261,7 +264,7 @@ if PLOT_FR_VS_WHISKING_AMPLITUDE_NOCONTACT_BY_NS_AND_STRATUM:
     ax.set_xlim(xlim)
     
     ax.set_xlabel('whisking amplitude ({})'.format(chr(176)))
-    ax.set_ylabel('firing rate gain')
+    ax.set_ylabel('firing rate gain', labelpad=12)
 
     
     ## Save

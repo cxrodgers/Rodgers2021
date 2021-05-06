@@ -94,7 +94,8 @@ if PLOT_MEAN_FIRING_RATE_BY_DEPTH:
     
     
     ## Plot
-    f, ax = my.plot.figure_1x1_small()
+    f, ax = plt.subplots(1, 1, figsize=(2.6, 2.4))
+    f.subplots_adjust(bottom=.28, left=.3, right=.95, top=.95)
     resdf['log_FR_total'] = np.log10(resdf['FR_total'])
     my.plot.smooth_and_plot_versus_depth(
         resdf, 'log_FR_total', ax=ax,
@@ -104,7 +105,11 @@ if PLOT_MEAN_FIRING_RATE_BY_DEPTH:
     ax.set_ylim((-1, 2))
     ax.set_yticks((-1, 0, 1, 2))
     ax.set_yticklabels(('0.1', '1', '10', '100'))
-    ax.set_ylabel('firing rate (Hz)')
+    ax.set_ylabel('firing rate (Hz)', labelpad=-3)
+    
+    # Legend
+    f.text(.9, .4, 'inhib.', color='b', ha='center', va='center')
+    f.text(.9, .32, 'excit.', color='r', ha='center', va='center')
     
     
     ## Save

@@ -139,10 +139,9 @@ for units in ['fold', 'Hz']:
             
 
         ## Create handles
-        #~ f, axa = my.plot.figure_1x2_small(sharex=True, sharey=True)
-        f, axa = plt.subplots(2, 1, figsize=(2.2, 3.5), sharex=True, sharey=True)
-        f.subplots_adjust(left=.25, bottom=.15, hspace=.4, top=.925, right=.95)
-        
+        f, axa = plt.subplots(2, 1, figsize=(2.6, 3.5), sharex=True, sharey=True)
+        f.subplots_adjust(left=.3, bottom=.15, hspace=.4, top=.925, right=.95)
+
 
         ## Group by stratum, NS, and typ
         grouping_keys = ['stratum', 'NS', 'typ']
@@ -219,7 +218,7 @@ for units in ['fold', 'Hz']:
         axa[1].set_xlabel('time from cycle peak (ms)')
 
         # Label y-axis
-        f.text(.075, .53, 'firing rate gain', rotation=90, ha='center', va='center')
+        f.text(.12, .53, 'firing rate gain', rotation=90, ha='center', va='center')
 
 
         ## Save
