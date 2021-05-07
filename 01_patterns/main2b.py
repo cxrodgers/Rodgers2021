@@ -15,6 +15,8 @@
 #
 # Cuts a wider window to avoid edge effects later
 
+import my
+import my.dataload
 import json
 import os
 import tqdm
