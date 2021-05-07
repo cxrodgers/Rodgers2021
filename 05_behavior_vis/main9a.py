@@ -26,11 +26,7 @@ with open('../parameters') as fi:
 
 
 ## Load metadata about sessions
-session_df = pandas.read_pickle(
-    os.path.join(params['pipeline_dir'], 'session_df'))
-task2mouse = session_df.groupby('task')['mouse'].unique()
-mouse2task = session_df[
-    ['task', 'mouse']].drop_duplicates().set_index('mouse')['task']
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
 
 mouse_name_l = sorted(session_df['mouse'].unique())
 

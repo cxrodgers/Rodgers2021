@@ -17,8 +17,7 @@ with open('../parameters') as fi:
 
 
 ## Sessions
-session_df = pandas.read_pickle(
-    os.path.join(params['pipeline_dir'], 'session_df'))
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
 session_name_l = list(session_df.index)
 
 

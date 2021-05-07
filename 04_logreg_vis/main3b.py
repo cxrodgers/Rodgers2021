@@ -44,12 +44,8 @@ with open('../parameters') as fi:
     
     
 ## Load metadata about sessions
-session_df = pandas.read_pickle(
-    os.path.join(params['pipeline_dir'], 'session_df'))
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
 big_tm = pandas.read_pickle(os.path.join(params['patterns_dir'], 'big_tm'))
-task2mouse = session_df.groupby('task')['mouse'].unique()
-mouse2task = session_df[
-    ['task', 'mouse']].drop_duplicates().set_index('mouse')['task']
 
 # Insert mouse and task levels into big_tm
 big_tm = my.misc.insert_mouse_and_task_levels(

@@ -25,8 +25,7 @@ with open('../parameters') as fi:
 
 
 ## Load metadata
-session_df = pandas.read_pickle(
-    os.path.join(params['pipeline_dir'], 'session_df'))
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
 big_tm = pandas.read_pickle(
     os.path.join(params['patterns_dir'], 'big_tm'))
 

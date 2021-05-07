@@ -73,10 +73,8 @@ reduced_results_dir = os.path.join(params['logreg_dir'], 'reduced_model_results_
 
 
 ## Load metadata about sessions
-session_df = pandas.read_pickle(os.path.join(params['pipeline_dir'], 'session_df'))
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
 big_tm = pandas.read_pickle(os.path.join(params['patterns_dir'], 'big_tm'))
-task2mouse = session_df.groupby('task')['mouse'].unique()
-mouse2task = session_df[['task', 'mouse']].drop_duplicates().set_index('mouse')['task']
 
 dataset = 'no_opto'
 task_l = ['discrimination', 'detection']

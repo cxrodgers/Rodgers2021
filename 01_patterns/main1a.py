@@ -98,4 +98,4 @@ for session_name in tqdm.tqdm(session_name_l):
     })
     
 session_df = pandas.DataFrame.from_records(rec_l).set_index('session')
-session_df.to_pickle(os.path.join(params['pipeline_dir'], 'session_df'))
+session_df.to_pickle(os.path.join(params['pipeline_output_dir'], 'session_df'))
