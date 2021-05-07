@@ -10,8 +10,9 @@ import subprocess
 import os
 import glob
 
-this_file_dir = os.path.split(__file__)[0]
-print("The name of this file is {}".format(__file__))
+this_filename = os.path.abspath(__file__)
+this_file_dir = os.path.dirname(this_filename)
+print("The name of this file is {}".format(this_filename))
 print("Starting in {}".format(this_file_dir))
 
 
@@ -54,7 +55,10 @@ try:
             print('\n'.join([
                 '\t\t- {}'.format(line) for line in proc_output.split('\n')
                 ]))
-            1/0
+            
+            if pyfilename.startswith('main1a'):
+                
+                1/0
 
 except subprocess.CalledProcessError:
     print("Encountered CalledProcessError, aborting")
