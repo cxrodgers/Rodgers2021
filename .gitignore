@@ -130,3 +130,7 @@ dmypy.json
 
 # CR
 default.parameters
+*.png
+*.svg
+STATS__*
+
