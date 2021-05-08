@@ -10,6 +10,8 @@
 """
 
 import os
+import json
+import imageio
 import pandas
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,6 +22,11 @@ import my
 import my.plot
 
 
+## Parameters
+with open('../parameters') as fi:
+    params = json.load(fi)
+    
+    
 ## Example session and frames
 session_name = '180221_KF132'
 convex_frame = 490102
@@ -90,8 +97,9 @@ for rewside in ['left', 'right']:
         other_rewside = 'left'
 
     # Get the frame
-    frame, junk, junk = my.video.get_frame(
-        vs.data.monitor_video.get_path, frame_number=frame_number)
+    frame = imageio.imread(os.path.join(
+        params['example_frames_dir'], 
+        '{}_{}.png'.format(session_name, frame_number)))
 
     # Create a figure with a single axis filling it
     figsize = (vs.frame_width / float(DPI), vs.frame_height / float(DPI))
