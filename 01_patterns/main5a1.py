@@ -12,11 +12,10 @@ import tqdm
 import numpy as np
 import whiskvid
 import my
+import my.dataload
 import pandas
 import os
 import matplotlib.pyplot as plt
-import MCwatch.behavior
-import runner.models
 from whiskvid.Handlers.TacHandler import label_greedy
 
 
@@ -27,11 +26,9 @@ with open('../parameters') as fi:
 N_POINTS = 100
 
 
-## Sessions
-# Behavioral datasets
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['decoding_tag'])
-session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
+## Load metadata about sessions
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+session_name_l = sorted(session_df.index)
 
 
 ## Load patterns data

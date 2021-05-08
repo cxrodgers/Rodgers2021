@@ -24,7 +24,6 @@ import numpy as np
 import whiskvid
 import pandas
 import MCwatch.behavior
-import runner.models
 
 
 ## Parameters
@@ -48,14 +47,9 @@ joint_location_dir = os.path.join(
     params['patterns_dir'], 'joint_location_each_session')
 
 
-## Behavioral datasets
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['decoding_tag'])
-session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
-
-
-## Load session_df with opto information
+## Load metadata about sessions
 session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+session_name_l = sorted(session_df.index)
 
 
 ## Iterate over sessions
@@ -67,6 +61,7 @@ keys_l = []
 for session_name in tqdm.tqdm(session_name_l):
     ## Get data
     vs = whiskvid.django_db.VideoSession.from_name(session_name)
+    frame_rate = session_df.loc[session_name, 'frame_rate']
     
 
     ## Load tip_pos_by_whisker
@@ -141,9 +136,9 @@ for session_name in tqdm.tqdm(session_name_l):
 
     ## Slice and extract
     # Window length
-    dstart = int(np.rint(vs.frame_rate * EXTRACTION_START_TIME))
-    dstop = int(np.rint(vs.frame_rate * EXTRACTION_STOP_TIME))
-    t = np.arange(dstart, dstop) / vs.frame_rate
+    dstart = int(np.rint(frame_rate * EXTRACTION_START_TIME))
+    dstop = int(np.rint(frame_rate * EXTRACTION_STOP_TIME))
+    t = np.arange(dstart, dstop) / frame_rate
 
     # Drop triggers with no data
     trial_matrix = trial_matrix.loc[

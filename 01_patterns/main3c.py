@@ -13,7 +13,6 @@ import pandas
 import os
 import matplotlib.pyplot as plt
 import MCwatch.behavior
-import runner.models
 
 
 

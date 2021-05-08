@@ -18,7 +18,7 @@ import numpy as np
 import whiskvid
 import pandas
 import MCwatch.behavior
-import runner.models
+import my.dataload
 
 
 ## Parameters
@@ -26,10 +26,9 @@ with open('../parameters') as fi:
     params = json.load(fi)
 
 
-## Behavioral datasets
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['decoding_tag'])
-session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
+## Load metadata about sessions
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+session_name_l = sorted(session_df.index)
 
 
 ## Create patterns_dir

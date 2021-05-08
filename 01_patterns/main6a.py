@@ -8,10 +8,10 @@ S2D
 """
 
 import json
+import os
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
-import os
 import my
 import my.plot
 

@@ -3,14 +3,12 @@
 
 import json
 import tqdm
-import MCwatch.behavior
 import ArduFSM
 import my
+import my.dataload
 import numpy as np
-import datetime
 import pandas
 import kkpandas
-import runner.models
 import whiskvid
 import os
 
@@ -32,11 +30,9 @@ lick_bins = np.linspace(-2, 1, 31)
 big_tm = pandas.read_pickle(os.path.join(params['patterns_dir'], 'big_tm'))
 
 
-## Sessions
-# Behavioral datasets
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['decoding_tag'])
-session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
+## Load metadata about sessions
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+session_name_l = sorted(session_df.index)
 
 
 ## Helper function

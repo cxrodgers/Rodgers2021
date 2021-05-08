@@ -25,7 +25,6 @@ import pandas
 import scipy.ndimage
 import whiskvid
 import MCwatch.behavior
-import runner.models
 import my, my.plot
 
 
@@ -45,10 +44,9 @@ EXTRACT_YMIN = -200
 EXTRACT_YMAX = 400
 
 
-## Behavioral datasets
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['decoding_tag'])
-session_name_l = sorted(gs_qs.values_list('name', flat=True))
+## Load metadata about sessions
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+session_name_l = sorted(session_df.index)
 
 
 ## Load data
@@ -138,6 +136,8 @@ for session_name in tqdm.tqdm(session_name_l):
     vs = whiskvid.django_db.VideoSession.from_name(session_name)
     trial_matrix = pandas.read_pickle(os.path.join(vs.session_path, 'trial_matrix'))
     
+    frame_height = session_df.loc[session_name, 'frame_height']
+    frame_width = session_df.loc[session_name, 'frame_width']
     
     ## Extract edges
     es = vs.data.edge_summary.load_data()
@@ -175,9 +175,9 @@ for session_name in tqdm.tqdm(session_name_l):
         ## Reindex the image into real pixels
         this_bnes = this_bnes.droplevel(['servo_pos', 'stepper_pos'])
         img0 = this_bnes.reindex(
-            range(vs.frame_height)).interpolate(
+            range(frame_height)).interpolate(
             limit_direction='both').reindex(
-            range(vs.frame_width), axis=1).interpolate(
+            range(frame_width), axis=1).interpolate(
             axis=1, limit_direction='both').values
 
         

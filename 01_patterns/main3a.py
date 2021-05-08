@@ -9,10 +9,10 @@ import tqdm
 import numpy as np
 import whiskvid
 import my
+import my.dataload
 import pandas
 import os
 import MCwatch.behavior
-import runner.models
 
 
 ## Parameters
@@ -30,11 +30,9 @@ if not os.path.exists(
     os.mkdir(os.path.join(params['patterns_dir'], 'ccs_with_kinematics'))
 
 
-## Sessions
-# Behavioral datasets
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['decoding_tag'])
-session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
+## Load metadata about sessions
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+session_name_l = sorted(session_df.index)
 
 
 ## Load kappa
@@ -58,6 +56,7 @@ mean_bout_keys_l = []
 for session_name in tqdm.tqdm(session_name_l):
     ## Load session data
     vs = whiskvid.django_db.VideoSession.from_name(session_name)
+    frame_rate = session_df.loc[session_name, 'frame_rate']
 
 
     ## Load data
@@ -90,7 +89,7 @@ for session_name in tqdm.tqdm(session_name_l):
         trial_matrix[LOCKING_COLUMN])
 
     # Convert to seconds using hardcoded frame rate
-    ccs['locked_t'] = ccs['locked_frame'] / vs.frame_rate
+    ccs['locked_t'] = ccs['locked_frame'] / frame_rate
 
     # Reset index
     ccs = ccs.reset_index()
