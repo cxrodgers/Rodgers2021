@@ -31,7 +31,6 @@ import scipy.ndimage
 import matplotlib.pyplot as plt
 import whiskvid
 import MCwatch.behavior
-import runner.models
 import my
 import my.plot
 
@@ -40,7 +39,11 @@ import my.plot
 with open('../parameters') as fi:
     params = json.load(fi)
 
-# Create if doesn't exist
+
+## Create pipeline and scaling_dir
+if not os.path.exists(params['pipeline_output_dir']):
+    os.mkdir(params['pipeline_output_dir'])
+
 if not os.path.exists(params['scaling_dir']):
     os.mkdir(params['scaling_dir'])
 
@@ -49,10 +52,9 @@ if not os.path.exists(params['scaling_dir']):
 ES_INTERVAL = 2
 
 
-## Behavioral datasets
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['decoding_tag'])
-session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
+## Load metadata about sessions
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+session_name_l = sorted(session_df.index)
 
 
 ## Iterate over sessions
@@ -63,6 +65,9 @@ for session_name in tqdm.tqdm(session_name_l):
     ## Load data from this session
     vs = whiskvid.django_db.VideoSession.from_name(session_name)
     trial_matrix = vs.data.trial_matrix.load_data()
+
+    frame_height = session_df.loc[session_name, 'frame_height']
+    frame_width = session_df.loc[session_name, 'frame_width']
     
     
     ## Extract edges
@@ -241,20 +246,6 @@ for session_name in tqdm.tqdm(session_name_l):
     assert error < 15 # px
 
     
-    #~ ## Debug plot
-    #~ f, ax = plt.subplots()
-    #~ my.plot.imshow(norm_es.mean(level='row'), 
-        #~ xd_range=(0, vs.frame_width),
-        #~ yd_range=(0, vs.frame_height),
-        #~ ax=ax)
-    #~ ax.axis('image')
-    #~ ax.scatter(
-        #~ np.array([keypoint_cv, keypoint_x0, keypoint_x1])[:, 1], 
-        #~ np.array([keypoint_cv, keypoint_x0, keypoint_x1])[:, 0], 
-        #~ c='yellow')
-    #~ f.suptitle(session_name)
-    
-    
     ## Define the origin as the mean of all keypoints
     origin = (keypoint_cv + keypoint_x0 + keypoint_x1) / 3.0
     
@@ -263,9 +254,9 @@ for session_name in tqdm.tqdm(session_name_l):
     # Generate test image
     img0 = binary_norm_es.mean(level='row')
     img0 = img0.reindex(
-        range(vs.frame_height)).interpolate(
+        range(frame_height)).interpolate(
         limit_direction='both').reindex(
-        range(vs.frame_width), axis=1).interpolate(
+        range(frame_width), axis=1).interpolate(
         axis=1, limit_direction='both').values
 
     # Translate so that origin is centered

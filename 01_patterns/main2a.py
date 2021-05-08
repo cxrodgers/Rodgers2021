@@ -32,6 +32,11 @@ gs_qs = runner.models.GrandSession.objects.filter(
 session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
 
 
+## Create patterns_dir
+if not os.path.exists(params['patterns_dir']):
+    os.mkdir(params['patterns_dir'])
+
+
 ## Create joint_location_dir
 joint_location_dir = os.path.join(
     params['patterns_dir'], 'joint_location_each_session')
