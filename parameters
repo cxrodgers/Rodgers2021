@@ -18,5 +18,7 @@
     "pipeline_input_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input",
     "root_session_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input/sessions",
     "unit_db_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input/neural_metadata",
+    "trainset_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input/trainset",
+    "glm_fits_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input/glm_fits",
     "example_frames_dir": "/home/jack/mnt/nas2_home/20210503_pipeline_input/example_frames"
 }
