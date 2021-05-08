@@ -1,5 +1,6 @@
 ## This directory is for making simple plots/parameterizations of the patterns
 # This script is for basic statistics of whisking
+# TODO: get the "n_frames" count working, somehow
 """
 2A
     STATS__TOPLINE_WHISK_PARAMS
