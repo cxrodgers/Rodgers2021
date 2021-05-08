@@ -9,7 +9,8 @@ import os
 import pandas
 import numpy as np
 import whiskvid
-
+import my
+import my.dataload
 
 ## Parameters
 with open('../parameters') as fi:
