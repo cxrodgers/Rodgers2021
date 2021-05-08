@@ -386,7 +386,7 @@ if PLOT_OBD_PERFORMANCE_BY_TASK_OUTCOME_AND_DECODELABEL:
 
         # Label N
         ax.text(
-            ax.get_xlim()[1] + .3, 1.05, 'n = {} mice'.format(len(indiv_mice)), 
+            ax.get_xlim()[1] + .3, 1.05, 'n = {} mice'.format(len(perf_by_mouse.loc[task])), 
             ha='right', va='center', size=12)
 
     # Labels
