@@ -1,18 +1,13 @@
+"""Helper functions for main4b2.py"""
+
 import json
 import os
 import pandas
 import numpy as np
-import scipy.stats
 import matplotlib.pyplot as plt
 import my
 import my.plot
 import my.bootstrap
-import extras
-
-
-from statsmodels.formula.api import ols
-from statsmodels.stats.anova import anova_lm, AnovaRM
-import scipy.stats
 
 
 ## Ordering
@@ -235,63 +230,3 @@ def horizontal_bar_pie_chart_signif(mfracsig, ax=None):
     return ax
 
 
-def model_compare_horizontal_bar(
-    metric_scores, metric_err, models_to_compare_df, ax, pvalue_ser=None,
-    signif_xpos=None):
-    """Horizontal bar plot likelihoods of models to compare"""
-    
-    ## Drop models that don't need to be plotted and sort in order of position
-    models_to_compare_df = models_to_compare_df.dropna().sort_values('position')
-    
-    # Sort
-    metric_scores = metric_scores.loc[
-        models_to_compare_df['pretty_name'].values]
-    metric_err = metric_err.loc[
-        models_to_compare_df['pretty_name'].values]
-
-    # Choose topl err
-    topl_err = np.array(
-        [metric_err['mpl_lo'].values, metric_err['mpl_hi'].values])
-    
-    
-    ## Horizontal bar
-    yticks = models_to_compare_df['position'].values
-    bar_container = ax.barh(
-        yticks,
-        width=metric_scores,
-        xerr=topl_err,
-        height=.8,
-        facecolor='lightgray', edgecolor='k',
-        error_kw={'lw': 1},
-    )
-    
-    # Unclip the error bars
-    bar_container.errorbar[2][0].set_clip_on(False)
-    
-    
-    ## Model name labels
-    ax.set_yticks(yticks)
-    ax.set_yticklabels(metric_scores.index.values, size=12)
-    
-    # Invert the y-axis
-    ax.set_ylim((np.max(yticks) + .5, np.min(yticks) - .5))
-
-    
-    ## Asterisks
-    if pvalue_ser is not None:
-        for ytick, model in zip(yticks, metric_scores.index):
-            try:
-                pvalue = pvalue_ser.loc[model]
-            except (IndexError, KeyError):
-                continue
-            
-            if pvalue < .001:
-                ax.text(signif_xpos, ytick, '***', ha='left', va='center', size=12)
-            elif pvalue < .01:
-                ax.text(signif_xpos, ytick, '**', ha='left', va='center', size=12)
-            elif pvalue < .05:
-                ax.text(signif_xpos, ytick, '*', ha='left', va='center', size=12)
-            else:
-                ax.text(signif_xpos, ytick, 'n.s.', ha='left', va='center', size=12)
-    
-    
