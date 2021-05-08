@@ -106,7 +106,7 @@ for session, neuron, trial in exemplars:
     drift_matrix = pandas.read_pickle(
         os.path.join(params['glm_dir'], 'models', model_name, session, 'drift_matrix'))
     fitting_results = pandas.read_pickle(
-        os.path.join(params['glm_dir'], 'results', model_name, 
+        os.path.join(params['glm_fits_dir'], model_name, 
         '{}-{}'.format(session, neuron)))
 
     # Concat the drift onto the data matrix

@@ -1,8 +1,11 @@
 ## Parse and reconstitute
-# Instead of running the swarm, I did this:
-# chris@companion:/mnt/farscape/homes/chris/misc$ rsync -rtvl 20200602_pipeline/glm/results 20210422_pipeline/glm
 # main4b1 unmangles, reconsitutes, and dumps
-
+# Loads the fit files for each model * neuron from params['glm_fits_dir']
+# Loads the model from 
+#   os.path.join(params['glm'], 'models', model_name, session_name)
+# Unmangles and reconstitutes
+# Stores results concatenated over session to 
+#   os.path.join(params['glm'], 'results', model_name)
 
 import json
 import os
@@ -75,8 +78,16 @@ model_names = [
 
 
 ## Paths
+# Where the fits from the cluster are
+glm_fits_dir = params['glm_fits_dir']
+
+# Inputs to those fits
 glm_models_dir = os.path.join(params['glm_dir'], 'models')
+
+# Further analysis results of those fits
 glm_results_dir = os.path.join(params['glm_dir'], 'results')
+if not os.path.exists(glm_results_dir):
+    os.mkdir(glm_results_dir)
 
     
 ## Load waveform info stuff
@@ -167,12 +178,12 @@ for model_name in model_names:
         
         ## Load each result
         for cluster in included_clusters:
-            results_filename = os.path.join(
-                glm_results_dir, model_name, '%s-%d' % (session_name, cluster))
+            fit_filename = os.path.join(
+                glm_fits_dir, model_name, '%s-%d' % (session_name, cluster))
 
-            if os.path.exists(results_filename):
-                ## Load results
-                results = pandas.read_pickle(results_filename) #my.misc.pickle_load(results_filename)
+            if os.path.exists(fit_filename):
+                ## Load fit
+                results = pandas.read_pickle(fit_filename)
                 coef_df = results['coef_df'].sort_index()
                 fitting_results = results['fitting_results'].sort_index()
                 
@@ -255,6 +266,7 @@ for model_name in model_names:
 
             else:
                 print("cannot find: %s" % results_filename)
+                1/0
 
 
     ## Concat
@@ -281,7 +293,13 @@ for model_name in model_names:
 
     
     ## Dump
+    # Make directory
+    results_model_dir = os.path.join(glm_results_dir, model_name)
+    if not os.path.exists(results_model_dir):
+        os.mkdir(results_model_dir)
+
+    # Dump
     coef_wscale_df.to_pickle(os.path.join(
-        glm_results_dir, model_name, 'coef_wscale_df'))
+        results_model_dir, 'coef_wscale_df'))
     fitting_results_df.to_pickle(os.path.join(
-        glm_results_dir, model_name, 'fitting_results_df'))
+        results_model_dir, 'fitting_results_df'))
