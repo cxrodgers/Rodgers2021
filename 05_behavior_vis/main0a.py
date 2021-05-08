@@ -13,6 +13,7 @@
 
 import json
 import os
+import imageio
 import numpy as np
 import pandas
 import matplotlib
@@ -302,8 +303,9 @@ if PLOT_EXAMPLE_FRAME:
     plot_frame = peak_frame + peak_frame_offset
 
     # Get example frame
-    frame, junk, junk = my.video.get_frame(
-        vs.data.monitor_video.get_path, frame_number=plot_frame)
+    frame = imageio.imread(os.path.join(
+        params['example_frames_dir'], 
+        '{}_{}.png'.format(session_name, plot_frame)))
 
     # Burn the edge summary into the frame
     burn_factor = 0.8
