@@ -18,8 +18,8 @@ this_file_dir = os.path.dirname(this_filename)
 print("The name of this file is {}".format(this_filename))
 print("Starting in {}".format(this_file_dir))
 
-start_at = '01_patterns', 'main2b.py'
-skip_start_flag = True
+start_at = '01_patterns', 'main6a.py'
+skip_start_flag = False
 
 ## Get dirnames to run
 dirnames = [
@@ -46,6 +46,7 @@ try:
 
         # Get filenames to run
         pyfilenames = sorted(glob.glob('*.py'))
+        pyfilenames = [fn for fn in pyfilenames if fn != 'extras.py']
         print("\tpyfilenames:\n{}".format('\n'.join(
             ['\t- ' + line for line in pyfilenames])))
 
