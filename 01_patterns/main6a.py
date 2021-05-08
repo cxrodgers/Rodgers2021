@@ -1,5 +1,5 @@
 ## Quantify performance of whisker tracking
-# relies on ../../20200408_trainset
+# relies on trainset_dir
 """
 S2D
     WHISKER_TRACKING_ERROR_RATE_BY_DATASET
@@ -7,6 +7,7 @@ S2D
     Error rate of whisker tracking algorithm    
 """
 
+import json
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
@@ -18,8 +19,13 @@ my.plot.font_embed()
 my.plot.manuscript_defaults()
 
 
+## Parameters
+with open('../parameters') as fi:
+    params = json.load(fi)
+    
+
 ## Paths to the last tracking run
-last_curation_dir = '../../20200408_trainset'
+last_curation_dir = params['trainset_dir']
 
 
 ## Load curated joints
