@@ -1,8 +1,4 @@
 ## Generate transformation_df and consensus_edge_summary
-# Looks like the concave shapes are slightly different for 228 and 231
-# I fixed by careful thresholding
-# TODO: move main1b and main1c to pipeline_prep, and hardcode these outputs
-
 """
 Procedure
 * Uses scaling_df to generate transformation_df for each session
@@ -235,38 +231,6 @@ for session_name in tqdm.tqdm(session_name_l):
         names=['servo_pos', 'stepper_pos'])
     
     
-    #~ ## Debug
-    #~ f, ax = plt.subplots()
-    #~ topl = warped_es_df.max(level='row')
-    #~ my.plot.imshow(
-        #~ topl,
-        #~ xd_range=(topl.columns[0], topl.columns[-1]),
-        #~ yd_range=(topl.index[0], topl.index[-1]),
-        #~ ax=ax,
-        #~ axis_call='image',
-        #~ )
-    
-    #~ # Plot the keypoints
-    #~ session_keypoints = transformed_keypoints.loc[session_name].unstack('coord')
-    #~ ax.plot([0], [0], 'ko')    
-    #~ ax.plot(
-        #~ [session_keypoints.loc['keypoint_cv', 'x']],
-        #~ [session_keypoints.loc['keypoint_cv', 'y']],
-        #~ 'bo')
-    #~ ax.plot(
-        #~ [session_keypoints.loc['keypoint_x0', 'x']],
-        #~ [session_keypoints.loc['keypoint_x0', 'y']],
-        #~ 'go')    
-    #~ ax.plot(
-        #~ [session_keypoints.loc['keypoint_x1', 'x']],
-        #~ [session_keypoints.loc['keypoint_x1', 'y']],
-        #~ 'ro')    
-
-    #~ plt.show()
-    #~ 1/0
-    
-    
-    
     ## Store
     warped_es_df_l.append(warped_es_df)
     warped_es_df_keys_l.append(session_name)
@@ -331,52 +295,6 @@ for grouped_keys, this_dilated in big_dilated.groupby(grouping_keys):
 
 # Concat
 big_thresholded = pandas.concat(thresholded_l, keys=thresholded_keys_l, names=grouping_keys)
-
-
-## Plot
-grouping_keys = ['servo_pos', 'stepper_pos']
-servo_pos_l = [1670, 1760, 1850]
-stepper_pos_l = [50, 150]
-f, axa = plt.subplots(len(stepper_pos_l), len(servo_pos_l), figsize=(12, 7.5))
-for grouped_keys, this_thresholded in big_thresholded.groupby(grouping_keys):
-    # Get ax
-    ax = axa[
-        stepper_pos_l.index(grouped_keys[1]), 
-        servo_pos_l.index(grouped_keys[0]),
-        ]
-
-    # Plot
-    im = my.plot.imshow(this_thresholded, ax=ax)
-    ax.axis('image')
-my.plot.harmonize_clim_in_subplots(fig=f)
-
-
-## Max the consensus edge summary over sessions and visualize it
-topl = big_thresholded.max(level='row')
-f, ax = plt.subplots()
-my.plot.imshow(
-    topl,
-    xd_range=(topl.columns[0], topl.columns[-1]),
-    yd_range=(topl.index[0], topl.index[-1]),
-    ax=ax,
-    )
-
-# Plot the keypoints
-global_keypoints = transformed_keypoints.mean().unstack('coord')
-ax.plot([0], [0], 'ko')    
-ax.plot(
-    [global_keypoints.loc['keypoint_cv', 'x']],
-    [global_keypoints.loc['keypoint_cv', 'y']],
-    'bo')
-ax.plot(
-    [global_keypoints.loc['keypoint_x0', 'x']],
-    [global_keypoints.loc['keypoint_x0', 'y']],
-    'go')    
-ax.plot(
-    [global_keypoints.loc['keypoint_x1', 'x']],
-    [global_keypoints.loc['keypoint_x1', 'y']],
-    'ro')  
-plt.show()
 
 
 ## Dump
