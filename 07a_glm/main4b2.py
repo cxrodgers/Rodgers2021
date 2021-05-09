@@ -1362,16 +1362,16 @@ if HEATMAP_CONTACT_COEF_BY_RECLOC:
         recloc2N = task_data[split_metric].value_counts()
         
         # Arrange the axes this way
-        recording_location_l1 = ['off', 'C1', 'C2',]
-        recording_location_l2 = ['fill', 'C3', 'fill',]
+        recording_location_l1 = ['C1', 'C2', 'C3']
+        recording_location_l2 = ['fill', 'off', 'fill',]
         
         # Each plot will have 4 axes, the last of which is a colorbar
         # Calculate empty 'fill' axes for the second one
-        fill = recloc2N[['off', 'C1', 'C2']].sum() - recloc2N['C3']
+        fill = recloc2N[['C1', 'C1', 'C3']].sum() - recloc2N['off']
         recording_location_N1 = np.array(
-            [recloc2N['off'], recloc2N['C1'], recloc2N['C2']])
+            [recloc2N['C1'], recloc2N['C2'], recloc2N['C3']])
         recording_location_N2 = np.array(
-            [fill / 4, recloc2N['C3'], fill * 3 / 4])
+            [0, recloc2N['off'], fill])
         
         # width_ratios
         width_ratios1 = recording_location_N1 / recording_location_N1.sum()
@@ -1379,14 +1379,14 @@ if HEATMAP_CONTACT_COEF_BY_RECLOC:
 
         ## Create figure handles
         f1, axa1 = plt.subplots(
-            1, len(width_ratios1), figsize=(7, 1.1), 
+            1, len(width_ratios1), figsize=(8.4, 1.1), 
             gridspec_kw={'width_ratios': width_ratios1})
-        f1.subplots_adjust(left=.05, right=.95, bottom=.25, top=.7, wspace=.35)
+        f1.subplots_adjust(left=.05, right=.95, bottom=.25, top=.7, wspace=.1)
 
         f2, axa2 = plt.subplots(
-            1, len(width_ratios2), figsize=(7, 1.1), 
+            1, len(width_ratios2), figsize=(8.4, 1.1), 
             gridspec_kw={'width_ratios': width_ratios2})
-        f2.subplots_adjust(left=.0, right=.9, bottom=.25, top=.7, wspace=.35)
+        f2.subplots_adjust(left=.05, right=.95, bottom=.25, top=.7, wspace=.1)
         axa2[0].set_visible(False)
         axa2[2].set_visible(False)
 
@@ -1429,7 +1429,7 @@ if HEATMAP_CONTACT_COEF_BY_RECLOC:
             ax.tick_params(labelsize=12)
             ax.set_xlim((-.5, topl.shape[1] - .5))
             ax.set_ylim((topl.shape[0] - .5, -.5))
-            if recloc in ['off', 'C3']:
+            if recloc in ['off', 'C1']:
                 ax.set_yticks(range(topl.shape[0]))
                 ax.set_yticklabels(topl.index.values, size=12)
             else:
