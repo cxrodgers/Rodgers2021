@@ -28,12 +28,7 @@ my.plot.poster_defaults()
 my.plot.font_embed()
 
 
-this_WHISKER2COLOR = {'C1': 'b', 'C2': 'g', 'C3': 'r'}
-DELTA = chr(916)
-
-
 ## Load the minimal model
-model_name = 'minimal+permute_whisks_with_contact'
 model_name = 'minimal'
 
 
@@ -170,14 +165,14 @@ if PLOT_CONTACT_COEF_EACH_WHISKER_BY_DECODING_SUBPOP:
     ## Plot coefficients for each whisker
     # Plot
     f, axa = plt.subplots(
-        1, 2, figsize=(4.5, 2.5), gridspec_kw={'width_ratios': [4.1, 1]}, sharey=True)
+        1, 2, figsize=(4.6, 2.5), gridspec_kw={'width_ratios': [4.1, 1]}, sharey=True)
     f.subplots_adjust(left=.15, bottom=.25, wspace=.2, right=.97)
 
     def index2plot_kwargs(ser):
         if ser['pref'] == 'concave':
-            color = 'b'
+            color = 'purple'
         elif ser['pref'] == 'convex':
-            color = 'r'
+            color = 'orange'
         else:
             color = 'k'
         
@@ -230,8 +225,8 @@ if PLOT_CONTACT_COEF_EACH_WHISKER_BY_DECODING_SUBPOP:
     axa[1].set_xlabel('C1 - C3', labelpad=9, size=12)
 
     # Legends
-    f.text(.99, .95, 'concave-preferring population', color='b', ha='right', va='center', size=12)
-    f.text(.99, .88, 'convex-preferring population', color='r', ha='right', va='center', size=12)
+    f.text(.99, .95, 'concave-preferring population', color='purple', ha='right', va='center', size=12)
+    f.text(.99, .88, 'convex-preferring population', color='orange', ha='right', va='center', size=12)
 
     
     ## Save
