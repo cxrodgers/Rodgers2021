@@ -7,7 +7,6 @@ import os
 import numpy as np
 import pandas
 import MCwatch.behavior
-import runner.models
 import matplotlib.pyplot as plt
 import my.plot
 import scipy.stats

@@ -73,15 +73,6 @@ session_table = session_table[
     (session_table['mouse'] != 'KM91') # no data from before first trim
     ].copy()
 
-#~ # Filter
-#~ gs_qs = runner.models.GrandSession.objects.filter(
-    #~ session__python_param_stimulus_set__in=[
-        #~ 'trial_types_2shapes_CCL_3srvpos', 'trial_types_CCL_3srvpos'],
-    #~ session__date_time_start__gte=dt_start,
-    #~ session__mouse__name__in=list(task2mouse.loc['discrimination']),
-    #~ )
-#~ session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
-
 session_name_l = sorted(session_table.index)
 
 

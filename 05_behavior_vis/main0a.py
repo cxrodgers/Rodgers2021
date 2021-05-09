@@ -18,8 +18,6 @@ import numpy as np
 import pandas
 import matplotlib
 import matplotlib.pyplot as plt
-import MCwatch.behavior
-import runner.models
 import whiskvid
 import my
 import my.plot
@@ -62,7 +60,6 @@ features = my.dataload.load_data_from_logreg(
 session_name = '180119_KM131'
 
 # Get handles
-gs = runner.models.GrandSession.objects.filter(name=session_name).first()
 vs = whiskvid.django_db.VideoSession.from_name(session_name)
 
 # Slice out tip pos
@@ -71,6 +68,10 @@ tip_angle = big_tip_pos.loc[
 
 # Load joints
 joints = vs.data.joints.load_data()
+
+# Frame shape
+frame_height = session_df.loc[session_name, 'frame_height']
+frame_width = session_df.loc[session_name, 'frame_width']
 
 
 ## Extract edges
@@ -96,7 +97,7 @@ binary_norm_es = (norm_es > .0001).astype(np.int)
 esumm = binary_norm_es.mean(level='row')
 
 # Reindex at frame resolution
-esumm = esumm.reindex(range(0, vs.frame_height)).reindex(range(0, vs.frame_width), axis=1)
+esumm = esumm.reindex(range(0, frame_height)).reindex(range(0, frame_width), axis=1)
 esumm = esumm.interpolate(
     limit_direction='both').interpolate(
     axis=1, limit_direction='both')
@@ -324,15 +325,15 @@ if PLOT_EXAMPLE_FRAME:
         if plot_meth == 'burn':
             # Plot frame
             my.plot.imshow(burned_frame, cmap=plt.cm.gray, clim=(0, 1), ax=ax,
-                xd_range=(0, vs.frame_width),
-                yd_range=(0, vs.frame_height),    
+                xd_range=(0, frame_width),
+                yd_range=(0, frame_height),    
                 axis_call='image',
                 )
         else:
             # Plot frame
             my.plot.imshow(frame, cmap=plt.cm.gray, clim=(0, 255), ax=ax,
-                xd_range=(0, vs.frame_width),
-                yd_range=(0, vs.frame_height),    
+                xd_range=(0, frame_width),
+                yd_range=(0, frame_height),    
                 axis_call='image',
                 )        
         
@@ -368,8 +369,8 @@ if PLOT_EXAMPLE_FRAME:
         
         # Pretty
         ax.axis('image')
-        ax.set_xlim((vs.frame_width, 0))
-        ax.set_ylim((0, vs.frame_height))
+        ax.set_xlim((frame_width, 0))
+        ax.set_ylim((0, frame_height))
         ax.set_frame_on(False)
 
         f.savefig(

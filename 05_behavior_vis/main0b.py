@@ -15,8 +15,6 @@ import imageio
 import pandas
 import numpy as np
 import matplotlib.pyplot as plt
-import MCwatch.behavior
-import runner.models
 import whiskvid
 import my
 import my.plot
@@ -25,7 +23,11 @@ import my.plot
 ## Parameters
 with open('../parameters') as fi:
     params = json.load(fi)
-    
+
+
+## Load metadata about sessions
+session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+
     
 ## Example session and frames
 session_name = '180221_KF132'
@@ -34,8 +36,11 @@ concave_frame = 242546
 
 
 ## Get handles
-gs = runner.models.GrandSession.objects.filter(name=session_name).first()
 vs = whiskvid.django_db.VideoSession.from_name(session_name)
+
+# Frame shape
+frame_height = session_df.loc[session_name, 'frame_height']
+frame_width = session_df.loc[session_name, 'frame_width']
 
 
 ## Load joints for plotting whiskers
@@ -102,7 +107,7 @@ for rewside in ['left', 'right']:
         '{}_{}.png'.format(session_name, frame_number)))
 
     # Create a figure with a single axis filling it
-    figsize = (vs.frame_width / float(DPI), vs.frame_height / float(DPI))
+    figsize = (frame_width / float(DPI), frame_height / float(DPI))
     f = plt.figure(frameon=False, figsize=figsize)
     ax = f.add_subplot(position=[0, 0, 1, 1])
     ax.set_frame_on(False)
@@ -143,8 +148,8 @@ for rewside in ['left', 'right']:
 
     # Rotate into standard orientation
     ax.axis('image')
-    ax.set_xlim((vs.frame_width, 0))
-    ax.set_ylim((0, vs.frame_height))
+    ax.set_xlim((frame_width, 0))
+    ax.set_ylim((0, frame_height))
     
     
     # Save

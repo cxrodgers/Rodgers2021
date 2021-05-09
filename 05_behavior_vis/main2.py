@@ -21,7 +21,6 @@ import scipy.stats
 import my
 import my.plot
 import whiskvid
-import runner.models
 
 
 ## Plot flags
@@ -32,7 +31,6 @@ my.plot.font_embed()
 ## Parameters
 with open('../parameters') as fi:
     params = json.load(fi)
-
 
 
 ## Load metadata about sessions
@@ -53,17 +51,6 @@ big_cycle_features = my.dataload.load_data_from_patterns(params,
 trial_count = big_tm.groupby('session').size()
 session_df['n_trials'] = trial_count
 trial_count = my.misc.insert_mouse_and_task_levels(trial_count, mouse2task)
-
-
-## Count frames
-n_frames_l = []
-for session_name in session_df.index:
-    gs = runner.models.GrandSession.objects.filter(name=session_name).first()
-    vs = whiskvid.django_db.VideoSession.from_name(session_name)
-    n_frames = int(np.rint(my.video.get_video_duration(
-        vs.data.monitor_video.get_path) * 30))
-    n_frames_l.append(n_frames)
-session_df['n_frames'] = n_frames_l
 
 
 ## Extract performance to correlate with these whisking metrics
