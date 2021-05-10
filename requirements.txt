@@ -9,9 +9,6 @@ statsmodels==0.12.2
 matplotlib==3.3.4
 future==0.18.2
 pyserial==3.5
-django==3.0.3
-sqlalchemy==1.4.7
-requests=2.25.1
 pytables==3.6.1
 tqdm==4.59.0
 jedi==0.17.2
