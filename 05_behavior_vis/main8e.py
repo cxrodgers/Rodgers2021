@@ -1,26 +1,20 @@
 ## Compare performance at various levels of trims
-# These mice are used:
-# Index(['219CR', '221CR', '229CR', '231CR', 'KF119', 'KF132', 'KF134', 'KM101', 'KM131'], dtype='object', name='mouse')
-# Only KM91 is missing, and that is because we have no data before first trim
-
 """
 S1C
     PLOT_PERFORMANCE_BY_N_ROWS
     N/A
     Performance versus number of rows of whiskers
 """
+
 import json
 import os
 import datetime
-import pytz
-import tqdm
 import numpy as np
 import pandas
 import matplotlib.pyplot as plt
-import MCwatch.behavior
-import runner.models
-import whisk_video.models
 import my
+import my.plot
+
 
 ## Plotting params
 my.plot.manuscript_defaults()
@@ -31,202 +25,11 @@ my.plot.font_embed()
 with open('../parameters') as fi:
     params = json.load(fi)
     
-    
-## Load metadata about sessions
-orig_session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
-
 
 ## Get data
-session_table = MCwatch.behavior.db.get_django_session_table()
-session_table.index.name = 'session'
-pdf = MCwatch.behavior.db.get_perf_metrics()
-trims = MCwatch.behavior.db.get_whisker_trims_table()
-
-# Index by session
-pdf = pdf.set_index('session').sort_index()
-
-# Fix this
-pdf = pdf.drop(['20150610152812.KM38', '20160520155855.KM63'])
-assert not pdf.index.duplicated().any()
-
-
-## Load trims
-trims = MCwatch.behavior.db.get_whisker_trims_table()
-
-
-## Choose behavioral sessions
-# Mice to analyze
-mouse_l = list(task2mouse.loc['discrimination'])
-
-# approx 2017-1-1 is when the servo spacing got finalized
-dt_start = datetime.datetime(
-    year=2017, month=1, day=1).astimezone(pytz.timezone('America/New_York'))
-
-# apply filter: mouse name, date, and 3 positions
-session_table = session_table[
-    session_table['mouse'].isin(mouse_l) &
-    (session_table['date_time_start'] > dt_start) &
-    (session_table['scheduler'] == 'Auto') &
-    session_table['stimulus_set'].isin(
-        ['trial_types_2shapes_CCL_3srvpos', 'trial_types_CCL_3srvpos']) &
-    (session_table.index != '20170406092802.KM101') & # screwed up servo pos for some reason
-    (session_table['mouse'] != 'KM91') # no data from before first trim
-    ].copy()
-
-session_name_l = sorted(session_table.index)
-
-
-## Iterate over sessions
-rec_l = []
-tm_l = []
-tm_keys_l = []
-for session_name in tqdm.tqdm(session_name_l):
-    ## Get mouse name
-    mouse_name = session_name.split('.')[1]
-    
-    
-    ## Process trial matrix
-    # Load trial matrix
-    trial_matrix = MCwatch.behavior.db.get_trial_matrix(session_name)
-
-    # Identify servo spacing
-    servo_pos = np.sort(trial_matrix['servo_pos'].unique())
-    servo_pos_is_correct = (servo_pos == np.array([1670, 1760, 1850])).all()
-    assert servo_pos_is_correct
-    
-
-    ## Identify whether this was an opto session
-    gs = runner.models.GrandSession.objects.filter(session__name=session_name).first()
-    has_opto_session = False
-    is_sham = False
-    if gs is not None:
-        try:
-            opto_session = gs.optosession
-            has_opto_session = True
-        except runner.models.OptoSession.DoesNotExist:
-            pass
-
-        if has_opto_session:
-            is_sham = opto_session.sham
-            assert is_sham in [True, False] 
-
-    # Set opto column properly
-    if (not has_opto_session) or is_sham:
-        trial_matrix['opto'] = 0    
-    
-
-    ## Store
-    tm_l.append(trial_matrix)
-    tm_keys_l.append((mouse_name, session_name))
-
-
-## Concat    
-tmdf = pandas.concat(tm_l, keys=tm_keys_l, names=['mouse', 'session']).sort_index()
-
-
-## Add trim to session_table
-# Slice trims by included mice and sort by time
-trims = trims.loc[
-    trims['Mouse'].isin(session_table['mouse'].unique())].sort_values('dt')
-
-# Apply each trim in order
-session_table['trim'] = 'all'
-for trim_idx in trims.index:
-    # Get mouse for this trim
-    mouse = trims.loc[trim_idx, 'Mouse']
-    trim_dt = trims.loc[trim_idx, 'dt']
-    trim_label = trims.loc[trim_idx, 'Which Spared']
-    
-    # Mask out rows of session_df 1) for this mouse 2) >= dt
-    mask = (
-        (session_table['mouse'] == mouse) &
-        (session_table['date_time_start'] >= trim_dt)
-        )
-    
-    # Apply trim label to those rows
-    session_table.loc[mask, 'trim'] = trim_label
-
-
-## Count rows
-session_table['n_rows'] = session_table['trim'].map({
-    'C*; b': 1,
-    'C*; g': 1,
-    'all': 5,
-    'C*; D*; b; g': 2,
-    'B*; C*; D*; a; b; g': 3,
-    'C*; b; g': 1,
-    'None': 0,
-    'B*; C*; D*; b; g': 3,
-    'B*; C*; D*; b; g; d': 3,
-    'C*; D*; g; d': 2,
-    })
-session_table['n_rows'] = session_table['n_rows'].astype(np.int)    
-
-# Exclude 0 rows for now
-session_table = session_table.loc[session_table['n_rows'] > 0].copy()
-
-
-## Make sure n_rows is decreasing
-session_table = session_table.sort_values('date_time_start')
-n_rows_l = []
-n_rows_keys_l = []
-drop_session_l = []
-for mouse, mouse_table in session_table.groupby('mouse'):
-    n_rows = mouse_table['n_rows']
-    assert (n_rows.diff().dropna() <= 0).all()
-    n_rows_l.append(n_rows.values)
-    n_rows_keys_l.append(mouse)
-    
-    # Keep only the ~10 most recent sessions with 5 rows
-    assert n_rows.iloc[0] == 5
-    all_mask = np.where(n_rows == 5)[0]
-    if len(all_mask) >= 10:
-        drop_sessions = n_rows.index.values[all_mask[:-10]]
-        drop_session_l.append(drop_sessions)
-
-# Apply the drop
-all_drop = np.concatenate(drop_session_l)
-session_table = session_table.drop(all_drop)
-
-# Apply that mask to tmdf
-tmdf = my.misc.slice_df_by_some_levels(tmdf, session_table.index)
-
-
-## More processing of trial matrix
-# Include only easy
-tmdf = tmdf.loc[tmdf['stepper_pos'].isin([50, 150])].copy()
-
-# Include only random non-spoiled
-tmdf = tmdf.loc[tmdf['outcome'].isin(['hit', 'error']) & tmdf.isrnd].copy()
-
-# Drop opto
-# Definitely include opto == 0 (sham and no laser), 
-# but what about 2 (laser off during actual opto test)?
-tmdf = tmdf.loc[tmdf['opto'].isin([0, 2])].copy()
-tmdf.index = tmdf.index.remove_unused_levels()
-
-
-## Mask out sessions
-# This doesn't change much
-# Count trials of each type per session
-n_trials_per_session = tmdf.groupby(
-    ['mouse', 'session', 'rewside', 'servo_pos']).size().unstack(
-    ['rewside', 'servo_pos']).fillna(0).astype(np.int)
-
-# Require >60 trials total and >10 of each type
-include_mask = (
-    (n_trials_per_session.sum(1) >= 60) & 
-    (n_trials_per_session > 10).all(1)
-    )
-
-# Apply include_mask
-tmdf = my.misc.slice_df_by_some_levels(
-    tmdf, include_mask.index[include_mask.values])
-tmdf.index = tmdf.index.remove_unused_levels()
-
-# Apply include_mask to session_table
-session_table = session_table.loc[
-    tmdf.index.get_level_values('session').unique()]
+gradual_trims_dir = os.path.join(params['pipeline_input_dir'], 'gradual_trims')
+tmdf = pandas.read_pickle(os.path.join(gradual_trims_dir, 'tmdf'))
+session_table = pandas.read_pickle(os.path.join(gradual_trims_dir, 'session_table'))
 
 
 ## Count sessions per mouse * n_rows and ensure enough of each type

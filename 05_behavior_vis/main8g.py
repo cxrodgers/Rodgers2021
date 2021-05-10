@@ -1,5 +1,4 @@
 ## Plot performance of KM100 and KM102 over gradual whisker trim
-
 """
 4F
     PLOT_PERF_BY_STIM_FOR_SINGLE_VS_ALL_WHISKERS_grand
@@ -11,12 +10,13 @@
     N/A
     Performance on single whisker by stimulus and position.
 """
-import pytz
-import datetime
-import MCwatch
+
+import json
+import os
 import pandas
 import numpy as np
 import matplotlib.pyplot as plt
+import my
 import my.plot
 import scipy.stats
 
@@ -30,117 +30,14 @@ my.plot.manuscript_defaults()
 my.plot.font_embed()
 
 
-## timezone
-tz = pytz.timezone('America/New_York')
-def convert(*args):
-    return tz.localize(datetime.datetime(*args))
-
+## Parameters
+with open('../parameters') as fi:
+    params = json.load(fi)
+    
 
 ## Get data
-session_table = MCwatch.behavior.db.get_django_session_table()
-session_table.index.name = 'session'
-pdf = MCwatch.behavior.db.get_perf_metrics()
-trims = MCwatch.behavior.db.get_whisker_trims_table()
-structured_trims = MCwatch.behavior.db.structure_trims(trims)
-
-# Index by session
-pdf = pdf.set_index('session').sort_index()
-
-# Fix this
-pdf = pdf.drop(['20150610152812.KM38', '20160520155855.KM63'])
-assert not pdf.index.duplicated().any()
-
-# Join perf metrics onto the session table
-session_table = session_table.join(
-    pdf[['n_trials', 'spoil_frac', 'perf_unforced', 'perf_all']])
-
-
-## Filter sessions for sanity
-# Include only gradual trim mice
-session_table = session_table[session_table['mouse'].isin(mouse_l)].copy()
-
-# Discard FA
-session_table = session_table[session_table['scheduler'] == 'Auto'].copy()
-
-# KM102 went through regrowth, so include only the first pass
-session_table = session_table.loc[
-    (session_table['mouse'] != 'KM102') |
-    (session_table['date_time_start'] <= convert(2017, 6, 16))
-    ].copy()
-
-
-## Join the trim onto the session table
-# Copied from MCwatch.behavior.db
-# This could be more elegant but seems to work
-session_table['trim'] = 'All'
-for idx in trims.index:
-    # Find matching rows of session_table
-    mouse = trims.loc[idx, 'Mouse']
-    dt_start = trims.loc[idx, 'dt']
-    mask = (
-        (session_table.mouse == mouse) &
-        (session_table.date_time_start >= dt_start)
-        )
-    
-    # Set those rows
-    session_table.loc[mask.values, 'trim'] = trims.loc[idx, 'Which Spared']
-
-# Add the structured trims
-session_table = pandas.concat(
-    [session_table, 
-    MCwatch.behavior.db._structure_trims(session_table['trim'])
-    ], verify_integrity=True, axis=1)
-
-
-## Iterate over mouse
-big_perf_l = []
-big_table_l = []
-for mouse in mouse_l:
-    
-    ## Get data for this mouse
-    mouse_session_table = session_table.loc[
-        session_table['mouse'] == mouse].copy()
-    
-    # Find days with >= 4 whiskers, and consider these all "baseline"
-    baselined_iidxs = np.where(mouse_session_table['n_whiskers'] >= 4)[0]
-    
-    # Drop all but the last 3 of those baseline days from the table
-    to_drop = mouse_session_table.index[baselined_iidxs[:-3]]
-    mouse_session_table = mouse_session_table.drop(to_drop)
-
-    
-    ## Extract perf vs side and servo pos for each session
-    perf_l = []
-    keys_l = []
-    for session in mouse_session_table.index:
-        # Get performance
-        tm = MCwatch.behavior.db.get_trial_matrix(session)
-        perf = MCwatch.behavior.extras.calculate_perf_from_trial_matrix(tm, 
-            groupby=['rewside', 'servo_pos'])
-        
-        # Get n_whiskers
-        n_whiskers = mouse_session_table.loc[session, 'n_whiskers']
-        
-        # Store
-        perf_l.append(perf)
-        keys_l.append((n_whiskers, session))
-    
-    # Concat
-    bigperf = pandas.concat(perf_l, keys=keys_l, names=['n_whiskers', 'session'])
-    
-
-    ## Store
-    big_table_l.append(mouse_session_table)
-    big_perf_l.append(bigperf)
-
-# Concat perf
-big_perf_df = pandas.concat(big_perf_l, keys=mouse_l, names=['mouse'])
-big_table_df = pandas.concat(big_table_l, keys=mouse_l, names=['mouse'])
-
-# Add n_whiskers to index
-big_table_df = big_table_df.set_index(
-    'n_whiskers', append=True).reorder_levels(
-    ['mouse', 'n_whiskers', 'session'])
+single_whisker_dir = os.path.join(params['pipeline_input_dir'], 'single_whisker')
+big_perf_df = pandas.read_pickle(os.path.join(single_whisker_dir, 'big_perf'))
 
 
 ## Plots

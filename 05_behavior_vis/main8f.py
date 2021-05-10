@@ -1,5 +1,4 @@
 ## Lesion performance
-
 """
 1C
     PLOT_LONGITUDINAL_LESION_EFFECT
@@ -12,13 +11,13 @@
     Summarize effect of lesion by averaging over days
 """
 
-import pytz
+import json
+import os
 import pandas
 import scipy.stats
 import matplotlib.pyplot as plt
-import MCwatch.behavior
-import datetime
 import numpy as np
+import my
 import my.plot
 import my.stats
 
@@ -28,118 +27,14 @@ my.plot.manuscript_defaults()
 my.plot.font_embed()
 
 
-## timezone
-tz = pytz.timezone('America/New_York')
-
+## Parameters
+with open('../parameters') as fi:
+    params = json.load(fi)
+    
 
 ## Get data
-session_table = MCwatch.behavior.db.get_django_session_table()
-session_table.index.name = 'session'
-pdf = MCwatch.behavior.db.get_perf_metrics()
-trims = MCwatch.behavior.db.get_whisker_trims_table()
-
-# Index by session
-pdf = pdf.set_index('session').sort_index()
-
-# Fix this
-pdf = pdf.drop(['20150610152812.KM38', '20160520155855.KM63'])
-assert not pdf.index.duplicated().any()
-
-
-## Hard-code lesion dates
-def convert(*args):
-    return tz.localize(datetime.datetime(*args))
-
-lesion_dates = pandas.DataFrame.from_records([
-    ('KM129', convert(2018, 2, 16, 18), None), # verified
-    ('KF133', convert(2018, 2, 15, 18), None), # verified
-    ('KM136', convert(2018, 2, 16, 18), None), # verified
-    ('KM147', convert(2018, 2, 16, 18), None), # verified
-    ('KM148', convert(2018, 2, 15, 18), None), # verified
-    ('242CR', convert(2020, 1, 20, 18), convert(2020, 1, 14, 18)), # verified
-    ('230CR', convert(2020, 1, 27, 18), None), # verified
-    ('243CR', convert(2020, 2, 17, 18), convert(2020, 2, 10, 18)), # verified
-    ], columns=['mouse', 'contra', 'ipsi'],
-    ).set_index('mouse')
-
-
-## Iterate over mouse
-N_PRE = 3
-ptb_keys_l = []
-ptb_l = []
-for mouse in lesion_dates.index:
-
-    ## Slice by mouse
-    mouse_bdf = session_table[session_table['mouse'] == mouse].copy()
-    mouse_trims = trims[trims['Mouse'] == mouse].copy()
-
-    # Join on perf
-    mouse_bdf = mouse_bdf.join(pdf)
-
-    # Sort by date
-    mouse_bdf = mouse_bdf.sort_values('date_time_start')
-
-
-    ## Find the day of lesions
-    dt_contra = lesion_dates.loc[mouse, 'contra']
-    dt_ipsi = lesion_dates.loc[mouse, 'ipsi']
-
-
-    ## Find the day of no whiskers
-    iidx = np.where(mouse_trims['Which Spared'] == 'None')[0]
-    assert len(iidx) == 1
-    assert iidx[0] == len(mouse_trims) - 1
-    dt_nwt = mouse_trims['dt'].iloc[-1]
-
-    
-    ## Divide into epochs
-    # Initially it's all baseline
-    # Then fill them in starting from the earlier ones
-    mouse_bdf['epoch'] = 'baseline'
-
-    # Ipsi
-    if not pandas.isnull(dt_ipsi):
-        assert dt_ipsi < dt_contra
-        mask = mouse_bdf['date_time_start'] > dt_ipsi
-        mouse_bdf.loc[mask, 'epoch'] = 'ipsi'
-
-    # Contra
-    mask = mouse_bdf['date_time_start'] > dt_contra
-    mouse_bdf.loc[mask, 'epoch'] = 'contra'
-    
-    # NWT
-    assert dt_nwt > dt_contra
-    mask = mouse_bdf['date_time_start'] > dt_nwt
-    mouse_bdf.loc[mask, 'epoch'] = 'nwt'
-
-    # Include only N_PRE sessions of baseline
-    start_iidx = np.where(mouse_bdf['epoch'] == 'baseline')[0][-N_PRE]
-    assert (mouse_bdf['epoch'].iloc[:start_iidx] == 'baseline').all()
-    mouse_bdf = mouse_bdf.iloc[start_iidx:].copy()
-    
-    
-    ## Error check some columns
-    assert (mouse_bdf['scheduler'] == 'Auto').all()
-    assert (mouse_bdf['n_trials'] > 100).all()
-    for col in ['stimulus_set', 'board', 'box']:
-        uvals = mouse_bdf[col].value_counts()
-        if len(uvals) != 1:
-            print("various values of {} for {}: {}".format(col, mouse, uvals))
-    
-
-    ## Store
-    peri = mouse_bdf[
-        ['perf_unforced', 'stimulus_set', 'epoch', 'date_time_start']
-        ].copy()
-    peri['n_day'] = np.arange(len(peri), dtype=np.int)
-    ptb_l.append(peri)
-    ptb_keys_l.append(mouse)
-
-
-## Concat
-big_peri = pandas.concat(ptb_l, keys=ptb_keys_l, names=['mouse'])
-big_peri = big_peri.set_index(
-    ['epoch', 'n_day'], append=True).reset_index('session').sort_index()
+lesion_dir = os.path.join(params['pipeline_input_dir'], 'lesion')
+big_peri = pandas.read_pickle(os.path.join(lesion_dir, 'big_peri'))
 
 
 ## Slice around locking events
@@ -258,8 +153,9 @@ if PLOT_QUANTIFIED_LESION_EFFECT:
     f.savefig('PLOT_QUANTIFIED_LESION_EFFECT.svg')
     f.savefig('PLOT_QUANTIFIED_LESION_EFFECT.png')
 
-    with open('STATS__PLOT_QUANTIFIED_LESION_EFFECT', 'w') as fi:
-        fi.write('STATS__PLOT_QUANTIFIED_LESION_EFFECT\n')
+    stats_filename = 'STATS__PLOT_QUANTIFIED_LESION_EFFECT'
+    with open(stats_filename, 'w') as fi:
+        fi.write(stats_filename + '\n')
         fi.write('n = {} contra mice: {}\n'.format(
             len(quantified.loc['contra']), quantified.loc['contra'].index.values))
         fi.write('n = {} ipsi, then contra mice: {}\n'.format(
@@ -267,6 +163,10 @@ if PLOT_QUANTIFIED_LESION_EFFECT:
 
         fi.write('paired t-test on contra only, p = {}\n'.format(pvalue))
         fi.write('insufficient data to test ipsi\n')
+    
+    with open(stats_filename) as fi:
+        lines = fi.readlines()
+    print(''.join(lines))
 
 
 ## Longitudinal plot around lesion

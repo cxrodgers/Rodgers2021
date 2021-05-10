@@ -1,12 +1,9 @@
 ## No whiskers plot
-# TODO: replace the use of get_perf_metrics with actual trial matrix
-# 
 
 import json
 import os
 import numpy as np
 import pandas
-import MCwatch.behavior
 import matplotlib.pyplot as plt
 import my.plot
 import scipy.stats
@@ -21,90 +18,32 @@ with open('../parameters') as fi:
     params = json.load(fi)
 
 
-## Load metadata about sessions
-session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
-
-    
 ## Get data
-session_table = MCwatch.behavior.db.get_django_session_table()
-session_table.index.name = 'session'
-pdf = MCwatch.behavior.db.get_perf_metrics()
-trims = MCwatch.behavior.db.get_whisker_trims_table()
-
-# Index by session
-pdf = pdf.set_index('session').sort_index()
-
-# Fix this
-pdf = pdf.drop(['20150610152812.KM38', '20160520155855.KM63'])
-assert not pdf.index.duplicated().any()
+whisker_trim_dir = os.path.join(params['pipeline_input_dir'], 'whisker_trim')
+big_peri = pandas.read_pickle(os.path.join(whisker_trim_dir, 'big_peri'))
+wt_bigtm = pandas.read_pickle(os.path.join(whisker_trim_dir, 'wt_bigtm'))
 
 
-## The single-whisker trim mice
-mouse_names = [
-    '228CR',
-    '229CR',
-    '231CR',
-    '245CR',
-    '255CR',
-    '267CR',
-    'KF132',
-    'KF134',
-    'KM101',
-    'KM131',
+## Calculate perf
+# Include only random, non-opto trials
+wt_bigtm = wt_bigtm[
+    wt_bigtm.isrnd &
+    wt_bigtm['opto'].isin([0, 2]) &
+    wt_bigtm['outcome'].isin(['hit', 'error'])
     ]
 
-## Iterate over mouse
-N_PRE = 5
-ptb_keys_l = []
-ptb_l = []
-for mouse in mouse_names:
-    ## Slice by mouse
-    mouse_bdf = session_table[session_table['mouse'] == mouse]
-    mouse_trims = trims[trims['Mouse'] == mouse]
+# Calculate perf
+session_perf = wt_bigtm['outcome'].groupby(
+    'session').value_counts().unstack('outcome').fillna(0).astype(np.int)
+session_perf['perf'] = session_perf['hit'].divide(
+    session_perf['hit'] + session_perf['error'])
 
-    # Exclude LickTrain, for which there is no perf
-    mouse_bdf = mouse_bdf[
-        ~mouse_bdf['scheduler'].isin(
-        ['ForcedAlternationLickTrain', 'LickTrain'])]
-
-    # Join on perf
-    mouse_bdf = mouse_bdf.join(pdf)
-
-    # Sort by date
-    mouse_bdf = mouse_bdf.sort_values('date_time_start')
-
-    ## Find the day of None
-    iidx = np.where(mouse_trims['Which Spared'] == 'None')[0]
-    assert len(iidx) == 1
-    assert iidx[0] == len(mouse_trims) - 1
-    dt_none = mouse_trims['dt'].iloc[-1]
-
-
-    ## Split the perf into pre- and post- trim
-    pre_trim_bdf = mouse_bdf[
-        mouse_bdf['date_time_start'] < dt_none].iloc[-N_PRE:].copy()
-    pre_trim_bdf['n_day'] = np.arange(-N_PRE, 0)
-    post_trim_bdf = mouse_bdf[
-        mouse_bdf['date_time_start'] >= dt_none].copy()
-    post_trim_bdf['n_day'] = np.arange(0, len(post_trim_bdf))
-    
-    # Concat
-    peri_trim_bdf = pandas.concat([pre_trim_bdf, post_trim_bdf])
-    
-
-    ## Store
-    ptb_l.append(peri_trim_bdf)
-    ptb_keys_l.append(mouse)
-
-
-## Concat
-big_peri = pandas.concat(
-    ptb_l, keys=ptb_keys_l, names=['mouse']).set_index(
-    'n_day', append=True).reset_index('session')
+# Join perf
+big_peri = big_peri.join(session_perf['perf'], on='session')
 
 
 ## Extract perf
-peri_perf = big_peri['perf_unforced'].unstack('mouse')
+peri_perf = big_peri['perf'].unstack('mouse')
 
 # Bin into pre and post
 binned_pp = pandas.concat([
