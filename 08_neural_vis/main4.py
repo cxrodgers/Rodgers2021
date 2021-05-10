@@ -13,18 +13,17 @@
 """
 
 import json
+import os
 import tqdm
-import MCwatch.behavior
+import numpy as np
+import pandas
+import matplotlib.pyplot as plt
+import kkpandas
+import whiskvid
 import ArduFSM
 import my
-import numpy as np
-import datetime
-import pandas
-import kkpandas
-import runner.models
-import whiskvid
-import os
-import matplotlib.pyplot as plt
+import my.plot
+import my.dataload
 
 
 ## Plots
@@ -38,7 +37,6 @@ with open('../parameters') as fi:
 
 
 ## Load data
-#big_tm = pandas.read_pickle(os.path.join(params['patterns_dir'], 'big_tm'))
 big_ccs_df = pandas.read_pickle(os.path.join(params['patterns_dir'], 'big_ccs_df'))
 
 FR_overall = pandas.read_pickle(

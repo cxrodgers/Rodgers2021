@@ -5,7 +5,6 @@
 import json
 import os
 import MCwatch.behavior
-import runner.models
 import whiskvid
 import pandas
 import numpy as np
@@ -105,15 +104,19 @@ for session_name in session_names:
     print(session_name)
 
 
-    ## Load spikes (for calculating drift)
-    spikes = pandas.read_pickle(
-        os.path.join(raw_spikes_dir, session_name, 'spikes'))
+    ## Get session objects
+    vs = whiskvid.django_db.VideoSession.from_name(session_name)
     
 
-    ## Get session objects
-    gs = runner.models.GrandSession.objects.filter(name=session_name).first()
-    vs = whiskvid.django_db.VideoSession.from_name(session_name)
+    ## Load spikes (for calculating drift)
+    # Error check these are the same, then remove this raw_spikes_dir
+    spikes = pandas.read_pickle(
+        os.path.join(raw_spikes_dir, session_name, 'spikes'))
 
+    spikes2 = pandas.read_pickle(
+        os.path.join(vs.session_path, 'spikes'))
+    assert (spikes == spikes2).all().all()
+    
 
     ## Trial matrix (for syncing drift times to frames)
     trial_matrix = big_tm.loc[session_name]

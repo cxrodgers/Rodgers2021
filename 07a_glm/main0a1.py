@@ -730,14 +730,6 @@ for model_name in model_names:
             'whisking_global',
             ])
 
-    # This one is now just the whisking model
-    #~ elif model_name == 'start_tip_angle_smoothed+global_amplitude_smoothed':
-        #~ to_dump = my.misc.fetch_columns_with_error_check(
-            #~ neural_unbinned_features, [
-            #~ 'log_cycle_duration',
-            #~ 'whisking_indiv_set_point_smoothed',
-            #~ 'whisking_global_smoothed',
-            #~ ])
 
     ## ELSE
     else:
