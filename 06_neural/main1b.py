@@ -12,12 +12,14 @@ S5B
 
 """
 
-import matplotlib.pyplot as plt
-import pandas
-import numpy as np
-import my.plot
 import json
 import os
+import pandas
+import numpy as np
+import matplotlib.pyplot as plt
+import my
+import my.dataload
+import my.plot
 
 
 ## Parameters

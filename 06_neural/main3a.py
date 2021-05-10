@@ -11,12 +11,11 @@ import json
 import os
 import pandas
 import numpy as np
-import kkpandas
-import MCwatch
-import whiskvid
-import runner.models
 import tqdm
+import whiskvid
 import matplotlib.pyplot as plt
+import my
+import my.dataload
 import my.plot
 
 
@@ -42,7 +41,6 @@ rec_keys_l = []
 
 for session_name in tqdm.tqdm(big_waveform_info_df.index.levels[0]):
     ## Get session objects
-    gs = runner.models.GrandSession.objects.filter(name=session_name).first()
     vs = whiskvid.django_db.VideoSession.from_name(session_name)
 
 
