@@ -108,9 +108,6 @@ DELTA = chr(916)
 
 ## Do each model in turn
 model_names = [
-    # Full (too big to fit, but useful for extracting the features)
-    'full',
-
     # Null model
     'null',
 
@@ -118,17 +115,10 @@ model_names = [
     'whisking',
     'contact_binarized',
     'task',
-    'fat_task',
     
     # The minimal model
     'minimal',
     
-    # Minimal with whisk permutation
-    'minimal+permute_whisks_with_contact',
-
-    # Minimal with random_regressor
-    #~ 'minimal+random_regressor',
-
     # MINIMAL_MINUS models
     # Whether the minimal model contains anything unnecessary
     'minimal-whisking',
@@ -139,26 +129,16 @@ model_names = [
     # This identifies any additional features about contacts that matter at all
     'contact_binarized+contact_interaction',
     'contact_binarized+contact_angle',
-    'contact_binarized+kappa_min',
-    'contact_binarized+kappa_max',
     'contact_binarized+kappa_std',
-    'contact_binarized+velocity2_tip',
     'contact_binarized+n_within_trial',
-    'contact_binarized+contact_duration',
     'contact_binarized+contact_stimulus',
     'contact_binarized+xw_latency_on',
     'contact_binarized+phase',
     'contact_binarized+xw_angle',
-    'contact_binarized+touching',
     
     # CONTACTS_MINUS
     # Currently this is just to test whether whisker identity matters
     'contact_count_by_time',
-    
-    # WHISKING
-    # To compare the coding for position of each whisker
-    'start_tip_angle+amplitude_by_whisker',
-    'start_tip_angle+global_amplitude',
 ]
 
 
@@ -286,9 +266,6 @@ if PLOT_CONTACTS_PLUS_COMPARISON_PRETTY:
     coef_wscale_df = big_coef_wscale_df.loc['minimal']
     data = coef_wscale_df.xs('contact_binarized', level='metric').copy()
 
-    # Keep only discrimination for now
-    #~ data = data.loc['discrimination'].copy()
-    
     # Results pretty similar if pooled
     data = data.droplevel('task')
 
@@ -356,7 +333,6 @@ if PLOT_CONTACTS_PLUS_COMPARISON_PRETTY:
         (0, 'contact_binarized', 'baseline (contacts with whisker identity)',),
         
         # Various removals
-        #~ (0, 'null', 'without contacts',), # This is way too negative
         (1, 'contact_count_by_time', 'without whisker identity',),
         
         # Various additions
@@ -367,7 +343,6 @@ if PLOT_CONTACTS_PLUS_COMPARISON_PRETTY:
         (7, 'contact_binarized+n_within_trial', 'with contact history',),
         (8, 'contact_binarized+contact_interaction', 'with cross-whisker interaction',),
         (9, 'contact_binarized+kappa_std', 'with contact-induced bending',),
-        #~ (10, 'contact_binarized+touching', 'with touching',), # This one helps!
         (11, 'contact_binarized+contact_stimulus', 'with stimulus identity',),
         ], columns=['position', 'model_name', 'pretty_name'])
 
@@ -436,7 +411,6 @@ if PLOT_CONTACTS_PLUS_COMPARISON_PRETTY:
         
         # Set x-label and x-ticks
         if use_metric == 'contact_ll_per_whisk_wrt_null':
-            #~ ax.set_xlabel('{}(log2 likelihood) during contact\n(bits / whisk)'.format(DELTA))
             ax.set_xlabel('{}goodness-of-fit during contact\n(bits / whisk)'.format(DELTA))
             ax.set_xlim((-.033, .033))
             ax.set_xticks((-.03, 0, .03))
@@ -503,7 +477,6 @@ if BAR_PLOT_ADDITIVE_MODEL_COMPARISON:
             (1, 'whisking', 'whisking only',),
             (2, 'contact_binarized', 'contacts only',),
             (4, 'minimal', 'task + whisking + contacts',),
-            #~ (5, 'full', 'full',),
             ], columns=['position', 'model_name', 'pretty_name'])
 
         
@@ -553,10 +526,6 @@ if BAR_PLOT_ADDITIVE_MODEL_COMPARISON:
         stats_keys_l = []
         for metric in metric_l:
             for model_to_compare in scores.index.levels[0]:
-                #~ # Skip the combination models
-                #~ if model_to_compare in ['full', 'task + whisking + contacts']:
-                    #~ continue
-                
                 # Compare versus zero
                 comp_data = scores.loc[model_to_compare].loc[metric]
                 test_res = scipy.stats.wilcoxon(
@@ -639,9 +608,6 @@ if BAR_PLOT_ADDITIVE_MODEL_COMPARISON:
 
 
         ## Shared x-label
-        #~ f.text(.7, .00, '{}(log2 likelihood) bits / whisk\ncompared with null model'.format(chr(916)),
-            #~ ha='center', va='center')
-        
         if metricate == 'll':
             f.text(.7, .00, '{}goodness-of-fit (bits / whisk)\ncompared with null model'.format(chr(916)),
                 ha='center', va='center')
@@ -733,9 +699,8 @@ if BAR_PLOT_SUBTRACTIVE_MODEL_COMPARISON:
             'pretty_name'].to_dict()
         scores = scores.rename(index=pretty_name_d)
 
-        # Baseline by the null model TODO: baseline by minimal
+        # Baseline by the null model
         scores = scores.sub(scores.loc['task + whisking + contacts'], level=1).sort_index()
-        #~ scores = scores.drop('null')
         scores.index = scores.index.remove_unused_levels()
 
 

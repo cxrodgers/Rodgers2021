@@ -16,9 +16,6 @@ with open('../parameters') as fi:
 
 ## Do each model in turn
 model_names = [
-    # Full (too big to fit, but useful for extracting the features)
-    'full',
-
     # Null model
     'null',
 
@@ -26,17 +23,10 @@ model_names = [
     'whisking',
     'contact_binarized',
     'task',
-    'fat_task',
     
     # The minimal model
     'minimal',
     
-    # Minimal with whisk permutation
-    'minimal+permute_whisks_with_contact',
-
-    # Minimal with random_regressor
-    'minimal+random_regressor',
-
     # MINIMAL_MINUS models
     # Whether the minimal model contains anything unnecessary
     'minimal-whisking',
@@ -47,26 +37,16 @@ model_names = [
     # This identifies any additional features about contacts that matter at all
     'contact_binarized+contact_interaction',
     'contact_binarized+contact_angle',
-    'contact_binarized+kappa_min',
-    'contact_binarized+kappa_max',
     'contact_binarized+kappa_std',
-    'contact_binarized+velocity2_tip',
     'contact_binarized+n_within_trial',
-    'contact_binarized+contact_duration',
     'contact_binarized+contact_stimulus',
     'contact_binarized+xw_latency_on',
     'contact_binarized+phase',
     'contact_binarized+xw_angle',
-    'contact_binarized+touching',
     
     # CONTACTS_MINUS
     # Currently this is just to test whether whisker identity matters
     'contact_count_by_time',
-    
-    # WHISKING
-    # To compare the coding for position of each whisker
-    'start_tip_angle+amplitude_by_whisker',
-    'start_tip_angle+global_amplitude',
 ]
 
 

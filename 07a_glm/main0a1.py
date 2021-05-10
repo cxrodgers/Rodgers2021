@@ -408,9 +408,6 @@ neural_unbinned_features = (
 
 ## Apply various reductions
 model_names = [
-    # Full (too big to fit, but useful for extracting the features)
-    'full',
-
     # Null model
     'null',
 
@@ -418,17 +415,10 @@ model_names = [
     'whisking',
     'contact_binarized',
     'task',
-    'fat_task',
     
     # The minimal model
     'minimal',
     
-    # Minimal with whisk permutation
-    'minimal+permute_whisks_with_contact',
-
-    # Minimal with random_regressor
-    'minimal+random_regressor',
-
     # MINIMAL_MINUS models
     # Whether the minimal model contains anything unnecessary
     'minimal-whisking',
@@ -439,26 +429,16 @@ model_names = [
     # This identifies any additional features about contacts that matter at all
     'contact_binarized+contact_interaction',
     'contact_binarized+contact_angle',
-    'contact_binarized+kappa_min',
-    'contact_binarized+kappa_max',
     'contact_binarized+kappa_std',
-    'contact_binarized+velocity2_tip',
     'contact_binarized+n_within_trial',
-    'contact_binarized+contact_duration',
     'contact_binarized+contact_stimulus',
     'contact_binarized+xw_latency_on',
     'contact_binarized+phase',
     'contact_binarized+xw_angle',
-    'contact_binarized+touching',
     
     # CONTACTS_MINUS
     # Currently this is just to test whether whisker identity matters
     'contact_count_by_time',
-    
-    # WHISKING
-    # To compare the coding for position of each whisker
-    'start_tip_angle+amplitude_by_whisker',
-    'start_tip_angle+global_amplitude',
 ]
 
 
@@ -513,52 +493,9 @@ for model_name in model_names:
             'task', 
             ])
 
-    elif model_name == 'fat_task':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'fat_task', 
-            ])
-
     
     ## Minimal
     elif model_name == 'minimal':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'contact_binarized',
-            'task', 
-            'whisking_indiv_set_point_smoothed',
-            'whisking_global_smoothed',
-            ])
-
-
-    ## Minimal with random_regressor
-    elif model_name == 'minimal+random_regressor':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'contact_binarized',
-            'task', 
-            'whisking_indiv_set_point_smoothed',
-            'whisking_global_smoothed',
-            ])
-        
-        # Generate random regressor
-        np.random.seed(0)
-        random_regressor = pandas.Series(
-            np.random.standard_normal(len(to_dump)),
-            index=to_dump.index,
-            name=('random_regressor', 'random_regressor'),
-            )
-        
-        # Concat and sort
-        to_dump = pandas.concat([to_dump, random_regressor], axis=1)
-        to_dump = to_dump.sort_index(axis=1)
-
-
-    ## Minimal with permutation
-    elif model_name == 'minimal+permute_whisks_with_contact':
         to_dump = my.misc.fetch_columns_with_error_check(
             neural_unbinned_features, [
             'log_cycle_duration',
@@ -614,22 +551,6 @@ for model_name in model_names:
             'angle',
             ])
 
-    elif model_name == 'contact_binarized+kappa_min':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'contact_binarized',
-            'kappa_min',
-            ])
-
-    elif model_name == 'contact_binarized+kappa_max':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'contact_binarized',
-            'kappa_max',
-            ])
-
     elif model_name == 'contact_binarized+kappa_std':
         to_dump = my.misc.fetch_columns_with_error_check(
             neural_unbinned_features, [
@@ -638,28 +559,12 @@ for model_name in model_names:
             'kappa_std',
             ])
 
-    elif model_name == 'contact_binarized+velocity2_tip':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'contact_binarized',
-            'velocity2_tip',
-            ])
-
     elif model_name == 'contact_binarized+n_within_trial':
         to_dump = my.misc.fetch_columns_with_error_check(
             neural_unbinned_features, [
             'log_cycle_duration',
             'contact_binarized',
             'n_within_trial',
-            ])
-
-    elif model_name == 'contact_binarized+contact_duration':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'contact_binarized',
-            'contact_duration',
             ])
 
     elif model_name == 'contact_binarized+contact_stimulus':
@@ -694,15 +599,7 @@ for model_name in model_names:
             'xw_angle',
             ])
 
-    elif model_name == 'contact_binarized+touching':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'contact_binarized',
-            'touching',
-            ])
-    
-    
+
     ## CONTACTS_MINUS
     elif model_name == 'contact_count_by_time':
         to_dump = my.misc.fetch_columns_with_error_check(
@@ -712,25 +609,6 @@ for model_name in model_names:
             ])
     
     
-    ## WHISKING
-    elif model_name == 'start_tip_angle+amplitude_by_whisker':
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'whisking_indiv_set_point',
-            'whisking_indiv_amplitude',
-            ])
-    
-    elif model_name == 'start_tip_angle+global_amplitude':
-        # The whisking model is this one with smoothing
-        to_dump = my.misc.fetch_columns_with_error_check(
-            neural_unbinned_features, [
-            'log_cycle_duration',
-            'whisking_indiv_set_point',
-            'whisking_global',
-            ])
-
-
     ## ELSE
     else:
         raise ValueError("unknown model: {}".format(model_name))
