@@ -14,13 +14,12 @@
 
 
 import json
+import os
 import pandas
 import numpy as np
-import os
 import kkpandas
 import MCwatch
 import whiskvid
-import runner.models
 import tqdm
 import my.neural
 
@@ -35,14 +34,10 @@ big_binned_spikes = pandas.read_pickle(
     os.path.join(params['neural_dir'], 'big_binned_spikes'))
 
 
-## Behavioral datasets
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['neural_tag'])
-session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
-
-
 ## Load metadata about sessions
-session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+neural_session_df = pandas.read_pickle(
+    os.path.join(params['pipeline_input_dir'], 'neural_session_df'))
+session_name_l = list(neural_session_df.index)
 
 
 ## Load data

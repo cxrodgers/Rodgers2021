@@ -20,7 +20,6 @@ import os
 import kkpandas
 import MCwatch
 import whiskvid
-import runner.models
 import tqdm
 import my.neural
 
@@ -43,16 +42,9 @@ EXTRACTION_START_FRAME = int(np.rint(EXTRACTION_START_TIME * 200))
 EXTRACTION_STOP_FRAME = int(np.rint(EXTRACTION_STOP_TIME * 200))
 
 
-## Behavioral datasets
-# Only include sessions for which we have neural data
-# These should all be in patterns data already
-gs_qs = runner.models.GrandSession.objects.filter(
-    tags__name=params['neural_tag'])
-session_name_l = sorted(list(gs_qs.values_list('name', flat=True)))
-
-
 ## Load metadata about sessions
-session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
+neural_session_df = pandas.read_pickle(
+    os.path.join(params['pipeline_input_dir'], 'neural_session_df'))
 
 
 ## Load data
@@ -69,14 +61,14 @@ C2_whisk_cycles = pandas.read_pickle(
 trial_matrix_l = []
 sliced_bsdf_l = []
 keys_l = []
-for session_name in tqdm.tqdm(session_name_l):
+for session_name in tqdm.tqdm(neural_session_df.index):
     ## Get data
     session_wc = C2_whisk_cycles.loc[session_name].copy()
     
     
     ## Get session objects
-    gs = runner.models.GrandSession.objects.filter(name=session_name).first()
     vs = whiskvid.django_db.VideoSession.from_name(session_name)
+    frame_rate = neural_session_df.loc[session_name, 'frame_rate']
 
 
     ## Load spikes
@@ -143,7 +135,7 @@ for session_name in tqdm.tqdm(session_name_l):
         spikes['trial'].map(trial_matrix['start_time_nbase']))
 
     # Convert to frames
-    spikes['frame_wrt_start'] = spikes['t_wrt_start'] * vs.frame_rate
+    spikes['frame_wrt_start'] = spikes['t_wrt_start'] * frame_rate
 
     # Add in the start frame
     spikes['frame'] = spikes['frame_wrt_start'] + spikes['trial'].map(
