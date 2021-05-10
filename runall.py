@@ -1,12 +1,17 @@
 ## Run all scripts
 
-"""This must be run in the conda environment.
+"""
+# First create a conda environment
 conda create --name Rodgers2021 --file requirements.txt
 conda activate Rodgers2021
 pip install -r pip_requirements.txt
 
-Then set this config var to ensure agg is always used
+# Then set this config var to ensure agg is always used
 conda env config vars set MPLCONFIGDIR=/home/jack/dev/Rodgers2021/mpl_config_dir
+
+# Then reactivate
+conda deactivate
+conda activate Rodgers2021
 """
 
 import subprocess
@@ -18,7 +23,7 @@ this_file_dir = os.path.dirname(this_filename)
 print("The name of this file is {}".format(this_filename))
 print("Starting in {}".format(this_file_dir))
 
-start_at = '01_patterns', 'main6a.py'
+start_at = '06_neural', 'main0b2.py'
 skip_start_flag = False
 
 ## Get dirnames to run
@@ -73,7 +78,11 @@ try:
             print('\n'.join([
                 '\t\t- {}'.format(line) for line in proc_output.split('\n')
                 ]))
-        1/0
+
+        # CWD
+        print("\tswitching to {}".format(this_file_dir))
+        os.chdir(this_file_dir)
+
 
 except subprocess.CalledProcessError:
     print("Encountered CalledProcessError, aborting")
