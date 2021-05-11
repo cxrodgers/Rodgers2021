@@ -38,8 +38,11 @@ big_waveform_info_df = my.dataload.load_bwid(params)
     
     
 ## Paths
-glm_results_dir = os.path.join(params['glm_dir'], 'results')
-model_results_dir = os.path.join(glm_results_dir, model_name)
+# This is the fitting_results_df (needed only to get n_reg_lambda)
+model_results_dir = os.path.join(params['glm_fits_dir'], model_name)
+
+# This is the actual result from pyglmnet
+glm_example_dir = params['glm_example_dir']
 
 
 ## Load metadata about sessions
@@ -47,16 +50,9 @@ session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
 
 
 ## Load results from main4b
-coef_wscale_df = pandas.read_pickle(os.path.join(
-    model_results_dir, 'coef_wscale_df'))
 fitting_results_df = pandas.read_pickle(os.path.join(
     model_results_dir, 'fitting_results_df'))
 
-# Normalize likelihood
-fitting_results_df['ll_per_whisk'] = (
-    (fitting_results_df['likelihood'] - fitting_results_df['null_likelihood']) / 
-    fitting_results_df['len_ytest'])
-    
 
 ## Load trial matrix from neural_patterns_dir
 big_tm = pandas.read_pickle(os.path.join(params['neural_dir'], 'neural_big_tm'))
@@ -106,7 +102,7 @@ for session, neuron, trial in exemplars:
     drift_matrix = pandas.read_pickle(
         os.path.join(params['glm_dir'], 'models', model_name, session, 'drift_matrix'))
     fitting_results = pandas.read_pickle(
-        os.path.join(params['glm_fits_dir'], model_name, 
+        os.path.join(params['glm_example_dir'],
         '{}-{}'.format(session, neuron)))
 
     # Concat the drift onto the data matrix

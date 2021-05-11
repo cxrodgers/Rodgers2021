@@ -165,7 +165,7 @@ big_waveform_info_df = my.dataload.load_bwid(params)
     
 ## Paths
 # Where to get patterns from
-glm_results_dir = os.path.join(params['glm_dir'], 'results')
+glm_results_dir = os.path.join(params['glm_fits_dir'])
 
 
 ## Load metadata about sessions

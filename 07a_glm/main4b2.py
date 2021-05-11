@@ -171,7 +171,7 @@ session_df, task2mouse, mouse2task = my.dataload.load_session_metadata(params)
 
 
 ## Load results from main4b
-glm_results_dir = os.path.join(params['glm_dir'], 'results')
+glm_results_dir = os.path.join(params['glm_fits_dir'])
 model_results_dir = os.path.join(glm_results_dir, model_name)
 coef_wscale_df = pandas.read_pickle(os.path.join(
     model_results_dir, 'coef_wscale_df'))

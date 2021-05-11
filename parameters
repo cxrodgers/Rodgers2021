@@ -20,5 +20,6 @@
     "unit_db_dir": "/home/jack/mnt/nas2_home/20210510_pipeline_input/neural_metadata",
     "trainset_dir": "/home/jack/mnt/nas2_home/20210510_pipeline_input/trainset",
     "glm_fits_dir": "/home/jack/mnt/nas2_home/20210510_pipeline_input/glm_fits",
+    "glm_example_dir": "/home/jack/mnt/nas2_home/20210510_pipeline_input/glm_example",
     "example_frames_dir": "/home/jack/mnt/nas2_home/20210510_pipeline_input/example_frames"
 }
