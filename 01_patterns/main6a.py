@@ -28,17 +28,7 @@ with open('../parameters') as fi:
 last_curation_dir = params['trainset_dir']
 
 
-## Load curated joints
-joints_df = pandas.read_pickle(
-    os.path.join(last_curation_dir, 'joints_df_with_folds'))
-fold_ids = joints_df[['session', 'frame', 'fold']].drop_duplicates().set_index(
-    ['session', 'frame']).sort_index()
-joints_df = joints_df.set_index(['session', 'frame', 'whisker', 'joint'])    
-
-    
 ## Load results of main7a in the last curation run
-optimized_predictions = pandas.read_pickle(
-    os.path.join(last_curation_dir, 'optimized_predictions'))
 optimized_wwr = pandas.read_pickle(
     os.path.join(last_curation_dir, 'optimized_wwr'))
 optimized_fwr = pandas.read_pickle(
