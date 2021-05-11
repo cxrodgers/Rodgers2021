@@ -42,8 +42,9 @@ big_tm = pandas.read_pickle(
 
 
 ## Load features
+# If 'full' is available, use it here to get all features
 glm_features = pandas.read_pickle(
-    os.path.join(params['glm_dir'], 'features', 'full', 
+    os.path.join(params['glm_dir'], 'features', 'contact_binarized+kappa_std', 
     'neural_unbinned_features')).sort_index()
 
 
@@ -62,18 +63,9 @@ my.misc.assert_index_equal_on_levels(
     
 
 ## Extract some features to correlate with FR
-# Of the kappas, I like kappa_std (most linear). 
-# But kappa_max accentuates the difference between whiskers the most
-# kappa_min is weird because C1 is completely insensitive to this param
-# velocity and duration look good
-# they don't seem that sensitive to angle (esp C1)
-# quite sensitive to anti_ange, probably reflecting whisking signals
-
 # Join these features
 feature_names = [
-    'kappa_std',# 'kappa_max', 'kappa_min', 
-    'velocity2_tip', #'contact_duration',
-    #~ 'anti_angle', 'angle', 
+    'kappa_std',
     ]
 
 # Extract contact_binarized
@@ -81,7 +73,6 @@ features_to_join = glm_features.loc[:, feature_names].copy()
 
 # Unit conversion
 features_to_join['kappa_std'] *= 1000 # 1/mm to 1/m
-features_to_join['velocity2_tip'] *= 200 # deg/frame to deg/s
 
 # Drop C0 because it's like 10x less common and often zero
 features_to_join = features_to_join.drop('C0', axis=1, level='label')
@@ -91,16 +82,6 @@ label_l = sorted(features_to_join.columns.get_level_values('label').unique())
 ## Join these features with the spike count
 # Squash before merging
 features_to_join.columns = ['-'.join(cols) for cols in features_to_join.columns]
-
-#~ # Standardize angle within session
-#~ cols_to_standardize = [
-    #~ 'angle-C1', 'angle-C2', 'angle-C3', 
-    #~ 'anti_angle-C1', 'anti_angle-C2', 'anti_angle-C3', 
-    #~ ]
-#~ for colname in cols_to_standardize:
-    #~ tostand = features_to_join[colname]
-    #~ standardized = tostand.sub(tostand.mean(level=0)).div(tostand.std(level=0))
-    #~ features_to_join.loc[:, colname] = standardized
 
 # Merge features on spikes
 merged = pandas.merge(
