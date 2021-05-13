@@ -308,7 +308,7 @@ right   1850      50          543.0    0.0    0.0  ...    0.0    0.0
 
 * `col` : the column number within the video frame.
 
-## `sessions/SESSION_NAME/spikes`
+## `sessions/SESSION_NAME/frontier_all_stim`
 
 ### Format
 
@@ -316,44 +316,302 @@ pickled `pandas.DataFrame`
 
 ### Short description
 
-This file only exists for sessions with neural data, and it contains
-the spike times for each single unit that was recorded.
+The "frontier" on each frame with respect to the response window,
+representing the closest possible position of any shape (the convex hull).
+A sampling whisk is one that crosses this frontier, regardless of whether
+contact was made.
+
+### Detailed description
+
+This is similar to the data in `all_edges`, except that it is the convex
+hull of all possible edges at that time with respect to the response window,
+rather than the edge position on every individual frame.
+
+#### Example
+
+```
+                     row  col
+locking_frame index          
+-400          0      496   72
+              1      496   74
+              2      500   88
+              3      500   90
+...                  ...  ...
+-10           435    368  480
+              436    372  484
+              437    376  488
+              438    442  548
+
+[12330 rows x 2 columns]
+```
+
+#### Index
+
+`pandas.MultiIndex` with the following levels:
+* `locking_frame` : the frame number with respect to response window opening.
+  For efficiency and because the shape moves slowly, this is only calculated
+  every 10 frames (50 ms).
+* `index` : arbitrary; indexes each pixel in the edge.
+
+#### Columns
+
+* `row` : the row number of that pixel on the edge
+* `col` : the column number of that pixel on the edge
+
+## `sessions/SESSION_NAME/joints`
+
+### Format
+
+pickled `pandas.DataFrame`
+
+### Short description
+
+The location of each of 8 equally spaced "joints" along each whisker on
+every frame.
+
+### Detailed description
+
+This is similar to `colorized_whisker_ends`, but it contains all 8 joints,
+rather than just the follicle and tip (corresponding to the first and last
+joints). It also contains the "confidence score" assigned by
+DeeperCut/PoseTensorflow/PoseTF to each joint.
+
+The bending (kappa) of each whisker was calculated by fitting a spline
+through these joints and running the output through `whisk`.
+
+#### Example
+
+```
+                         c              ...         p          
+joint                    0           1  ...         6         7
+frame  whisker                          ...                    
+0      C0       447.833118  466.035449  ...  0.999930  0.999692
+       C1       381.717058  410.374808  ...  0.999886  0.999901
+       C2       371.997747  402.577738  ...  0.999865  0.999668
+       C3       413.103072  438.023576  ...  0.999893  0.999849
+...                    ...         ...  ...       ...       ...
+528599 C0       455.288867  473.403332  ...  0.999916  0.999035
+       C1       371.784443  403.080980  ...  0.999905  0.999942
+       C2       353.080241  386.107643  ...  0.999925  0.999949
+       C3       406.218208  431.193778  ...  0.999905  0.999854
+
+[2082241 rows x 24 columns]
+```
+
+#### Index
+
+`pandas.MultiIndex` with the following levels:
+* `frame` : the frame number within the video.
+* `whisker` : the name of the whisker, one of `{'C0', 'C1', 'C2', 'C3'}`
+
+#### Columns
+
+`pandas.MultiIndex` with the following levels:
+* [unnamed] : one of `{'c', 'r', 'p'}`, corresponding to the column, row,
+  and confidence of each joint.
+* `joint` : indexes the joint number. An integer between 0 (the follicle) and 7
+  (the tip), inclusively.
+
+## `sessions/SESSION_NAME/neural_trial_timings`
+
+### Format
+
+pickled `pandas.DataFrame`
+
+### Short description
+
+This only exists for sessions with neural data. It contains metadata about
+the timing of each trial within the _neural timebase_.
+
+### Detailed description
+
+This is similar to `trial_matrix` but it contains information for
+synchronizing neural and behavioral data on each trial.
+
+NaN values indicate that that trial did not occur during the neural recording.
+
+Use the `rwin_time_nbase` column to get the response window time of each trial
+in the _neural timebase_, the same time base in which the spike times are
+reported in the file called `spikes`.
+
+#### Example
+
+```
+       start_time_nbase  start_sample  ...  rwin_time_nbase  rwin_sample
+trial                                  ...                              
+0                   NaN           NaN  ...              NaN          NaN
+1                   NaN           NaN  ...              NaN          NaN
+2                   NaN           NaN  ...              NaN          NaN
+3                   NaN           NaN  ...              NaN          NaN
+...                 ...           ...  ...              ...          ...
+298         2805.089700    77660691.0  ...      2808.112700   77751381.0
+299         2821.080900    78140427.0  ...      2824.104900   78231147.0
+300         2828.449300    78361479.0  ...      2831.471300   78452139.0
+301         2837.219567    78624587.0  ...      2840.242567   78715277.0
+
+[302 rows x 6 columns]
+```
+
+#### Index
+
+The trial number. This aligns exactly with `trial_matrix`.
+
+#### Columns
+
+* `start_time_nbase` : The start time of the trial in the _neural timebase_.
+* `start_sample` : The sample number within the neural recording binary file
+  corresponding to `start_time_nbase`.
+* `nbase_resid` : ignore
+* `vframe_npred` : ignore
+* `rwin_time_nbase` : The time at which the response window opened on this
+  trial, in the _neural timebase_. __Use this column to synchronize neural
+  and behavioral data.__
+* `rwin_sample` : The sample number within the neural recording binary file
+  corresponding to `rwin_time_nbase`.
+
+## `sessions/SESSION_NAME/neural_trial_timings`
+
+### Format
+
+pickled `pandas.DataFrame`
+
+### Short description
+
+This only exists for sessions with neural data. It contains metadata about
+the timing of each trial within the _neural timebase_.
+
+### Detailed description
+
+This is similar to `trial_matrix` but it contains information for
+synchronizing neural and behavioral data on each trial.
+
+NaN values indicate that that trial did not occur during the neural recording.
+
+Use the `rwin_time_nbase` column to get the response window time of each trial
+in the _neural timebase_, the same time base in which the spike times are
+reported in the file called `spikes`.
+
+#### Example
+
+```
+       start_time_nbase  start_sample  ...  rwin_time_nbase  rwin_sample
+trial                                  ...                              
+0                   NaN           NaN  ...              NaN          NaN
+1                   NaN           NaN  ...              NaN          NaN
+2                   NaN           NaN  ...              NaN          NaN
+3                   NaN           NaN  ...              NaN          NaN
+...                 ...           ...  ...              ...          ...
+298         2805.089700    77660691.0  ...      2808.112700   77751381.0
+299         2821.080900    78140427.0  ...      2824.104900   78231147.0
+300         2828.449300    78361479.0  ...      2831.471300   78452139.0
+301         2837.219567    78624587.0  ...      2840.242567   78715277.0
+
+[302 rows x 6 columns]
+```
+
+#### Index
+
+The trial number. This aligns exactly with `trial_matrix`.
+
+#### Columns
+
+* `start_time_nbase` : The start time of the trial in the _neural timebase_.
+* `start_sample` : The sample number within the neural recording binary file
+  corresponding to `start_time_nbase`.
+* `nbase_resid` : ignore
+* `vframe_npred` : ignore
+* `rwin_time_nbase` : The time at which the response window opened on this
+  trial, in the _neural timebase_. __Use this column to synchronize neural
+  and behavioral data.__
+* `rwin_sample` : The sample number within the neural recording binary file
+  corresponding to `rwin_time_nbase`.
+
+## `sessions/SESSION_NAME/trial_matrix`
+
+### Format
+
+pickled `pandas.DataFrame`
+
+### Short description
+
+Metadata about each behavioral trial.
 
 ### Detailed description
 
 #### Example
 
 ```
-                time  cluster    sample
-0         216.406900      833       207
-1         216.410900      833       327
-2         216.416300       71       489
-3         216.416967      194       509
-...              ...      ...       ...
-1131147  2845.105467      833  78861164
-1131148  2845.106967      193  78861209
-1131149  2845.108033       50  78861241
-1131150  2845.109233      472  78861277
+       start_time  release_time  ...  shape_stop_frame  shape_stop_time
+trial                            ...                                   
+0          11.541        19.324  ...               NaN              NaN
+1          19.326        34.185  ...               NaN              NaN
+2          34.188        48.838  ...               NaN              NaN
+3          48.841        63.540  ...               NaN              NaN
+...           ...           ...  ...               ...              ...
+298      2701.337      2717.320  ...               NaN              NaN
+299      2717.323      2724.685  ...               NaN              NaN
+300      2724.688      2733.453  ...               NaN              NaN
+301      2733.456           NaN  ...               NaN              NaN
 
-[1131151 rows x 3 columns]
-
+[302 rows x 21 columns]
 ```
 
 #### Index
 
-Arbitrary
+The trial number.
 
 #### Columns
 
-* `cluster` : the id of this single unit. This is unique within each session,
-  but not across sessions. This matches the index in `big_waveform_info_df`.
-  Because the word `cluster` is ambiguous, I plan to replace it with the word
-  `neuron`.
-* `sample` : the sample number within the recording, always using a sample
-  rate of 30 kHz.
-* `time` : the time of the spike, in the _neural timebase_.
-
-Note that sample 30000 is not guaranteed to be time 1.0 s, but rather some
-arbitrary offset start time plus 1.0 s. This offset corresponds to the time
-between starting the Open Ephys display and clicking the record button. The
-analysis code relies exclusively on `time` and not on `sample`.
+* `start_time` : The time the trial started, in the _behavioral timebase_.
+  In most cases, you want to use `rwin_time` instead.
+* `release_time` : ignore
+* `duration` : The duration of the trial, in seconds
+* `dirdel` : either 2 or 3, where 3 indicates a reward was delivered
+  automatically at the beginning of the response window. All such trials were
+  used only for behavioral shaping and are marked as "munged" and ignored.
+* `isrnd` : either 2 or 3, where 3 indicates the stimulus was randomly chosen
+  on that trial. All other trials were used only for behavioral shaping and
+  are marked as "munged" and should be ignored.
+* `opto` : either 2 or 3, where 2 indicates no optogenetic stimulus occurred.
+  Note that even when this value is 3, an optogenetic stimulus would only have
+  been delivered on the minority of sessions for which `opto` is True in
+  the file called `session_df`.
+* `outcome` : one of `{'hit', 'error', 'spoil', 'curr'}`. `'hit'` means that
+  the trial was correct, `'error'` means incorect, `'spoil'` means that the
+  mouse made no choice at all, and `'curr'` means the trial was in progress
+  when the session ended.
+* `choice` : one of `{'left', 'right', 'nogo'}`, where `left` means the mouse
+  licked left, `right` means it licked right, and `nogo` means it didn't lick
+  at all (in which case the outcome was spoiled).
+* `rewside` : the rewarded side, one of `{'left', 'right'}`. The meaning of
+  this depends on the task, which is one of `{'discrimination', 'detection'}`
+  and is coded in `session_df`. For discrimination, `'left'` means concave and
+  `'right'` means convex. For detection, `'left'` means no shape and `'right'`
+  means either shape.
+* `servo_pos` : the position of the linear servo (distance from the face);
+  one of `{1670, 1760, 1850}`, corresponding to far, medium, and close trials.
+* `stepper_pos` : the position of the stepper (which shape was presented);
+  one of {50, 150, 100, 199}. 50 always means convex and 150 always means
+  convex. For discrimination sessions, 100 and 199 mean the flatter shapes,
+  which were only used on a minority of sessions. For all detection sessions,
+  100 and 199 mean no shape.
+* `choice_time` : the time of the choice lick, in seconds.
+* `rwin_time` : the time of the response window opening, in seconds in the
+  _behavioral timebase_.
+* `rt` : the "reaction time", which is simply the difference between the
+  `choice_time` and the `rwin_time` (not a true reaction time).
+* `exact_start_frame` : the frame number in the video corresponding to the
+  start time of the trial.
+* `vbase_resid` : ignore
+* `exact_start_frame_next` : the frame number in the video corresponding to the
+  start time of the next trial.
+* `munged` : boolean encoding whether the trial was "munged", meaning that it
+  should be ignored. Most commonly, this is because the trial was not truly
+  random (`isrnd` is 2) for some reason relating to behavioral shaping.
+* `rwin_frame` : the frame number in the video corresponding to the opening
+  of the response window. __Use this column to synchronize video and
+  behavior.__
+* `shape_stop_frame` : the frame number at which the shape reached its
+  final position and stopped moving.
+* `shape_stop_time` : the time at which the shape reached its final position
+  and stopped moving, in the _behavioral timebase_.
