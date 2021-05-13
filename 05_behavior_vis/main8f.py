@@ -38,7 +38,7 @@ big_peri = pandas.read_pickle(os.path.join(lesion_dir, 'big_peri'))
 
 
 ## Slice around locking events
-locking_events = ['contra', 'ipsi', 'nwt']
+locking_events = ['contra', 'ipsi']
 mouse_l = big_peri.index.levels[0]
 
 locked_l = []
@@ -84,9 +84,7 @@ locked_df = pandas.concat(locked_l, keys=keys_l, names=['event', 'mouse'])
 
 
 ## Quantify summary
-# Forget about no-whiskers here, some learned to cheat, but were
-# initially impaired so that seems fine
-locked_df2 = locked_df.drop('nwt')
+locked_df2 = locked_df.copy()
 
 # Keep only 3 days after lesion
 locked_df2 = locked_df2.loc[pandas.IndexSlice[:, :, :, :, range(-3, 3)], :]
