@@ -91,11 +91,48 @@ use something like this:
 
 ## Timebases
 
-TODO: Document the _neural, behavioral, and video timebases_.
+Three "timebases" are used throughout this data: behavioral, neural, and video.
+These timebases differ because the behavioral session, neural recording,
+and video were never started at exactly the same time. Moreover, the clock
+rate of each can be slightly different (even after accounting for differences
+in nominal rate).
+* The behavioral timebase is the number of seconds since the beginning of
+  the behavioral session. It is used, for instance, in
+  `sessions/SESSION_NAME/trial_matrix`.
+* The video timebase is the number of frames since the beginning of the video.
+  Even though all videos were taken at 200 fps, these times are calculated
+  assuming the video was taken at 30 fps (which it was not). These times
+  are used in data taken from the video, like
+  `sessions/SESSION_NAME/colorized_whisker_ends`.
+* The neural timebase is the number of seconds since the recording began. The
+  recordings were taken at 30 kHz. These times are used in data from the
+  recordings, like `sessions/SESSION_NAME/spikes`.
+
+To convert video times to behavioral times, use the column `rwin_frame` in
+`sessions/SESSION_NAME/trial_matrix`, which is the video frame at which
+the response window opened on each trial.
+
+To convert neural times to behavioral times, use the column `rwin_time_nbase`
+in `sessions/SESSION_NAME/neural_trial_timings`, which is the time of
+the response window opening in the neural timebase.
 
 ## Optogenetics
 
-TODO: Document the use of optogenetics.
+On a minority of sessions (indicated by `session_df['opto']`), an
+optogenetic laser was used.
+
+For those sessions, the laser was used only for trials for which the column
+labeled `'opto'` in `sessions/SESSION_NAME/trial_matrix` contains the value 3.
+For all other sessions, the values in that column are completely irrelevant,
+as no laser was used.
+
+On a minority of optogenetic sessions (indicated by `session_df['sham']`),
+the laser was used, but it was not pointed at the brain, as a control.
+
+For all sessions with bona fide optogenetic stimulation (i.e., those for which
+the 'opto' column was True and the 'sham' column was False), we discarded
+from analysis trials with the laser. For all other sessions, we included
+all trials.
 
 ## Raw versus intermediate data
 
