@@ -1,3 +1,4 @@
 [submodule "submodules/my"]
 	path = submodules/my
-	url = https://github.com/cxrodgers/my
+    url = https://github.com/cxrodgers/my
+    branch = Rodgers2021
