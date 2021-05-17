@@ -1,7 +1,15 @@
 # Introduction
 
-This README explains how to use the dataset of behavioral and neural results
-collected during the shape discrimination and detection tasks.
+This dataset provides the data necessary to recapitulate the analyses and 
+results presented in the article "Sensorimotor strategies and neuronal 
+representations for shape discrimination" (Rodgers et al., 2021). If you use 
+this dataset for a manuscript or publication, please cite that article, 
+which describes the procedures originally used to collect, analyze, and 
+interpret this dataset. As of 2021-05-17, the article is in press at the 
+journal "Neuron".
+
+The accompanying code for analyzing this dataset is available from 
+https://github.com/cxrodgers/Rodgers2021.
 
 You will likely want to start by downloading the following items:
 1. The dataset, hosted on Zenodo at the following DOI: 10.5281/zenodo.4743837
