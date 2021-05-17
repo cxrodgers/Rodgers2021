@@ -1,0 +1,3 @@
+[submodule "submodules/my"]
+	path = submodules/my
+	url = https://github.com/cxrodgers/my
