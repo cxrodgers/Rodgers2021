@@ -2,3 +2,19 @@
 	path = submodules/my
     url = https://github.com/cxrodgers/my
     branch = Rodgers2021
+[submodule "submodules/ArduFSM"]
+	path = submodules/ArduFSM
+	url = https://github.com/cxrodgers/ArduFSM
+	branch = Rodgers2021
+[submodule "submodules/kkpandas"]
+	path = submodules/kkpandas
+	url = https://github.com/cxrodgers/kkpandas
+	branch = Rodgers2021
+[submodule "submodules/MCwatch"]
+	path = submodules/MCwatch
+	url = https://github.com/cxrodgers/MCwatch
+	branch = Rodgers2021
+[submodule "submodules/whiskvid"]
+	path = submodules/whiskvid
+	url = https://github.com/cxrodgers/whiskvid
+	branch = Rodgers2021
