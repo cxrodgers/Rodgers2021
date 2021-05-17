@@ -9,6 +9,9 @@ pip install -r pip_requirements.txt
 # Then set this config var to ensure agg is always used
 conda env config vars set MPLCONFIGDIR=/home/jack/dev/Rodgers2021/mpl_config_dir
 
+# Then set this config var as a path to the submodules
+conda env config vars set PYTHONPATH=~/dev/Rodgers2021/submodules
+
 # Then reactivate
 conda deactivate
 conda activate Rodgers2021
