@@ -4,7 +4,7 @@ This README explains how to use the dataset of behavioral and neural results
 collected during the shape discrimination and detection tasks.
 
 You will likely want to start by downloading the following items:
-1. The dataset, hosted on Zenodo at the following DOI: XXX
+1. The dataset, hosted on Zenodo at the following DOI: 10.5281/zenodo.4743837
 2. The code used to process the data in a forthcoming paper. This code is
    hosted as a repository on Github at
    https://github.com/cxrodgers/Rodgers2021
@@ -88,6 +88,12 @@ Note that the npy files were stored with Python 2. To load them in Python 3,
 use something like this:
 
 * `numpy.load(filename, allow_pickle=True, encoding='latin1')`
+
+The pickled `pandas.DataFrame` files were generated with `pandas` version 
+1.2.4. It is likely that you will need to use an identical version of `pandas` 
+to load these files. For a complete list of system requirements, consult the 
+files `requirements.txt` and `pip_requirements.txt` in the repository 
+https://github.com/cxrodgers/Rodgers2021.
 
 ## Timebases
 
