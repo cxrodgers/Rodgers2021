@@ -18,8 +18,13 @@ You will likely want to start by downloading the following items:
    https://github.com/cxrodgers/Rodgers2021
 
 This document explains each component file of the dataset, how to open it,
-and how to interpret it. For documentation on the code used to process the
-data, see the README for the github repository.
+and how to interpret it. This document was last updated on __2021-05-17__. 
+The most up-to-date version can always be found at
+https://github.com/cxrodgers/Rodgers2021/blob/main/DATA_README.md.
+
+Additional documentation on how to use the code in the github repository
+may be found at 
+https://github.com/cxrodgers/Rodgers2021/blob/main/README.md.
 
 ## Structure of the dataset
 
