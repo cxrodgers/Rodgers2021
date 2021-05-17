@@ -163,5 +163,5 @@ python runall.py
 
 The results will be stored as figures in the numbered subdirectories.
 
-This CSV file lists the subdirectory and script name that generates each
+[This CSV file](figure_panels.csv) lists the subdirectory and script name that generates each
 panel in the manuscript, as well as the image filename of the figure.
