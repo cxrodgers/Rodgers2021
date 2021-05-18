@@ -1,22 +1,5 @@
 ## Run all scripts
 
-"""
-# First create a conda environment
-conda create --name Rodgers2021 --file requirements.txt
-conda activate Rodgers2021
-pip install -r pip_requirements.txt
-
-# Then set this config var to ensure agg is always used
-conda env config vars set MPLCONFIGDIR=/home/jack/dev/Rodgers2021/mpl_config_dir
-
-# Then set this config var as a path to the submodules
-conda env config vars set PYTHONPATH=~/dev/Rodgers2021/submodules
-
-# Then reactivate
-conda deactivate
-conda activate Rodgers2021
-"""
-
 import subprocess
 import os
 import glob
@@ -26,7 +9,7 @@ this_file_dir = os.path.dirname(this_filename)
 print("The name of this file is {}".format(this_filename))
 print("Starting in {}".format(this_file_dir))
 
-start_at = '06_neural', 'main0b2.py'
+start_at = '06_neural', 'main0a.py'
 skip_start_flag = False
 
 ## Get dirnames to run
