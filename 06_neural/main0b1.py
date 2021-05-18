@@ -21,7 +21,7 @@ import kkpandas
 import MCwatch
 import whiskvid
 import tqdm
-import my.neural
+import my
 
 
 ## Parameters
