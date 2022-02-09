@@ -2,8 +2,8 @@
 
 This repository provides the code necessary to recapitulate the analyses
 and figures presented in the article entitled "Sensorimotor strategies and
-neuronal representations for shape discrimination". As of May 2021, this
-article was in press.
+neuronal representations for shape discrimination". 
+https://doi.org/10.1016/j.neuron.2021.05.019
 
 A somewhat out-of-date preprint version of the article is available at bioRxiv
 https://www.biorxiv.org/content/10.1101/2020.06.16.126631v1.
