@@ -11,6 +11,7 @@ https://www.biorxiv.org/content/10.1101/2020.06.16.126631v1.
 # Downloading the dataset
 
 The data will be available at the following DOI: 10.5281/zenodo.4743837.
+https://zenodo.org/record/4743837#.YgQ7xYzMIuU
 
 The dataset on Zenodo consists of an archive file called `ShapeDataset.zip`.
 Download that file and unzip it. Make note of the location. The rest of
