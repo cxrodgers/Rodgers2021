@@ -8,6 +8,15 @@ https://doi.org/10.1016/j.neuron.2021.05.019
 A somewhat out-of-date preprint version of the article is available at bioRxiv
 https://www.biorxiv.org/content/10.1101/2020.06.16.126631v1.
 
+Update September 2022: A new version of this dataset is available at 
+https://dandiarchive.org/dandiset/000231, with a related preprint at
+https://www.biorxiv.org/content/10.1101/2022.05.10.491259v1
+containing extensive documentation. The advantage of the new dataset is that 
+it includes more raw data (the entire electrophysiological recording, all 
+the videos), and it is in the Neurodata Without Borders (NWB) format. 
+However, this Rodgers2021 dataset remains useful for replicating the analyses 
+presented in the original Neuron paper.
+
 # Downloading the dataset
 
 The data will be available at the following DOI: 10.5281/zenodo.4743837.
