@@ -1050,7 +1050,7 @@ The trial number. This aligns exactly with `trial_matrix`.
 * `rwin_sample` : The sample number within the neural recording binary file
   corresponding to `rwin_time_nbase`.
 
-## `sessions/SESSION_NAME/neural_trial_timings`
+## `sessions/SESSION_NAME/spikes`
 
 ### Format
 
@@ -1058,54 +1058,50 @@ pickled `pandas.DataFrame`
 
 ### Short description
 
-This only exists for sessions with neural data. It contains metadata about
-the timing of each trial within the _neural timebase_.
+This only exists for sessions with neural data. It contains the time of every
+identified neuron's spikes in the _neural timebase_.
 
 ### Detailed description
 
-This is similar to `trial_matrix` but it contains information for
-synchronizing neural and behavioral data on each trial.
+Each row of this DataFrame corresponds to a single spike. The `cluster`
+column identifies which neuron generated the spike. The other two columns
+give the time of the spike in the _neural timebase_ or as a sample
+number within the electrophysiological recording.
 
-NaN values indicate that that trial did not occur during the neural recording.
-
-Use the `rwin_time_nbase` column to get the response window time of each trial
-in the _neural timebase_, the same time base in which the spike times are
-reported in the file called `spikes`.
+To align spikes with behavioral data, the recommended approach is to use the 
+column `time` which aligns with the column `rwin_time_nbase` in 
+`neural_trial_timings` (they are both in the _neural timebase_). 
+Alternatively, the column `sample` could be used, which aligns with the 
+column `rwin_sample` in `neural_trial_timings`, but this second method is 
+not recommended because it is no more precise and introduce another timebase.
 
 #### Example
 
 ```
-       start_time_nbase  start_sample  ...  rwin_time_nbase  rwin_sample
-trial                                  ...                              
-0                   NaN           NaN  ...              NaN          NaN
-1                   NaN           NaN  ...              NaN          NaN
-2                   NaN           NaN  ...              NaN          NaN
-3                   NaN           NaN  ...              NaN          NaN
-...                 ...           ...  ...              ...          ...
-298         2805.089700    77660691.0  ...      2808.112700   77751381.0
-299         2821.080900    78140427.0  ...      2824.104900   78231147.0
-300         2828.449300    78361479.0  ...      2831.471300   78452139.0
-301         2837.219567    78624587.0  ...      2840.242567   78715277.0
+               time  cluster    sample
+0        110.634867      295      3746
+1        110.729233      300      6577
+2        110.742333      295      6970
+3        110.750867       39      7226
+...             ...      ...       ...
+266520  2621.239667      295  75321890
+266521  2621.241367      294  75321941
+266522  2621.247967      300  75322139
+266523  2621.248933      299  75322168
 
-[302 rows x 6 columns]
+[266524 rows x 3 columns]
 ```
 
 #### Index
 
-The trial number. This aligns exactly with `trial_matrix`.
+A simple integer `RangeIndex` with no other meaning.
 
 #### Columns
 
-* `start_time_nbase` : The start time of the trial in the _neural timebase_.
-* `start_sample` : The sample number within the neural recording binary file
-  corresponding to `start_time_nbase`.
-* `nbase_resid` : ignore
-* `vframe_npred` : ignore
-* `rwin_time_nbase` : The time at which the response window opened on this
-  trial, in the _neural timebase_. __Use this column to synchronize neural
-  and behavioral data.__
-* `rwin_sample` : The sample number within the neural recording binary file
-  corresponding to `rwin_time_nbase`.
+* `time` : The time of the spike in the _neural timebase_.
+* `cluster` : An integer that identifies this individual neuron.
+* `sample` : The sample number within the electrophysiological recording
+    at which this spike occurred.
 
 ## `sessions/SESSION_NAME/trial_matrix`
 
